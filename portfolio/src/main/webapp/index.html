@@ -4,22 +4,54 @@
     <meta charset="UTF-8">
     <title>My Portfolio</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <script src="script.js"></script>
   </head>
   <body>
     <div id="content">
       <h1>Andrzej Podobinski</h1>
       <div id="tiles">
-           <div class="tile" id="tile1"></div>
-           <div class="tile" id="tile2"></div>
-           <div class="tile" id="tile3"></div>
-           <div class="tile" id="tile4"></div>
-           <div class="tile" id="tile5"></div>
-           <div class="tile" id="tile6"></div>
+           <div class="tile" id="tile1">
+            <div class="icon-container">
+                <i class="material-icons md-48">face</i>
+                <p>About me</p>
+            </div>
+           </div>
+           <div class="tile" id="tile2">
+            <div class="icon-container">
+                <i class="material-icons md-48">show_chart</i>
+                <p>Career</p>
+            </div>
+           </div>
+           <div class="tile" id="tile3">
+               <div class="icon-container"> 
+                <i class="material-icons md-48">chat</i>
+                <p>Contact</p>
+               </div>
+           </div>
+           <div class="tile" id="tile4">
+            <div class="icon-container">    
+                <img src="images/GitHub-Mark-64px.png " alt="github icon" width="48px" height="48px"> 
+                <p>My Github account</p>
+            </div>
+           </div>
+           <div class="tile" id="tile5">
+                <div class="icon-container">
+                <i class="material-icons md-48">school</i>
+                <p>Education</p>
+            </div>
+           </div>
+           <div class="tile" id="tile6">
+            <div class="icon-container">
+                <i class="material-icons md-48">sports_tennis</i>
+                <p>Hobby</p>
+            </div>
+           </div>
       </div>
-      <p>Click here to get a random message:</p>
+      <!-- <p>Click here to get a random message:</p>
       <button onclick="addRandomGreeting()">Hello</button>
-      <div id="greeting-container"></div>
+      <div id="greeting-container"></div> -->
     </div>
   </body>
 </html>
