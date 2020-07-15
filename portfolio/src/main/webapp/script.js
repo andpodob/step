@@ -36,7 +36,7 @@ window.onload = function(){
 
     const tiles = document.getElementsByClassName("tile");
 
-    var openPopup = function(){
+    const openPopup = function(){
         popupBackground.style.display = "flex";
         const tileId = this.id;
 
@@ -78,8 +78,3 @@ window.onload = function(){
         tiles[i].addEventListener("click", openPopup, false);
     }
 }
-
-
-
-
-
