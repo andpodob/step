@@ -32,30 +32,28 @@ function addRandomGreeting() {
 
 
 window.onload = function(){
-    var popupBackground = document.getElementById("popup-background")
+    const popupBackground = document.getElementById("popup-background")
 
-    var tiles = document.getElementsByClassName("tile");
+    const tiles = document.getElementsByClassName("tile");
 
     var openPopup = function(){
         popupBackground.style.display = "flex";
-        var tileId = this.id;
+        const tileId = this.id;
 
         //cutting number from id
-        var tileNumber = tileId.replace(/[^0-9]/g, '');
+        const tileNumber = tileId.replace(/[^0-9]/g, '');
         
         //generating popup id
-        var popupId = "popup-"+tileNumber;
+        const popupId = "popup-"+tileNumber;
 
         //showing popup
-        var popup = document.getElementById(popupId);
+        const popup = document.getElementById(popupId);
         popup.style.display="block";
 
         //aplying blure to content
-        var content = document.getElementById("content");
+        const content = document.getElementById("content");
         content.style.filter = "blur(4px)";
         content.style.webkitFilter = "blur(4px)";
-
-        console.log(popupId);
     }
 
     window.onclick = function(event) {
@@ -64,13 +62,13 @@ window.onload = function(){
             popupBackground.style.display = "none";
             
             //hidding popup
-            var popups = document.getElementsByClassName("popup");
+            const popups = document.getElementsByClassName("popup");
             for(var i = 0; i < popups.length; i++){
                 popups[i].style.display = "none";
             }
             
             //restoring blure property of content
-            var content = document.getElementById("content");
+            const content = document.getElementById("content");
             content.style.filter = "blur(0px)";
             content.style.webkitFilter = "blur(0px)";
         }
@@ -79,7 +77,6 @@ window.onload = function(){
     for(var i = 0; i < tiles.length; i++){
         tiles[i].addEventListener("click", openPopup, false);
     }
-
 }
 
 
