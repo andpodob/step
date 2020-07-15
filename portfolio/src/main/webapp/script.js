@@ -26,3 +26,55 @@ function addRandomGreeting() {
   const greetingContainer = document.getElementById('greeting-container');
   greetingContainer.innerText = greeting;
 }
+
+
+
+
+
+window.onload = function(){
+    const popupBackground = document.getElementById("popup-background")
+
+    const tiles = document.getElementsByClassName("tile");
+
+    const openPopup = function(){
+        popupBackground.style.display = "flex";
+        const tileId = this.id;
+
+        //cutting number from id
+        const tileNumber = tileId.replace(/[^0-9]/g, '');
+        
+        //generating popup id
+        const popupId = "popup-"+tileNumber;
+
+        //showing popup
+        const popup = document.getElementById(popupId);
+        popup.style.display="block";
+
+        //aplying blure to content
+        const content = document.getElementById("content");
+        content.style.filter = "blur(4px)";
+        content.style.webkitFilter = "blur(4px)";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == popupBackground) {
+            //hiding the background
+            popupBackground.style.display = "none";
+            
+            //hidding popup
+            const popups = document.getElementsByClassName("popup");
+            for(var i = 0; i < popups.length; i++){
+                popups[i].style.display = "none";
+            }
+            
+            //restoring blure property of content
+            const content = document.getElementById("content");
+            content.style.filter = "blur(0px)";
+            content.style.webkitFilter = "blur(0px)";
+        }
+    }
+
+    for(var i = 0; i < tiles.length; i++){
+        tiles[i].addEventListener("click", openPopup, false);
+    }
+}
