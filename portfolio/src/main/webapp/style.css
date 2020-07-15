@@ -25,8 +25,8 @@ p {
 }
 
 .popup {
-    width: 70vw;
-    height: 40vw;
+    width: 50vw;
+    height: 50vh;
     display: none;
     background-color: white;
     box-shadow: 0px 0px 25px #000000; 
