@@ -48,7 +48,7 @@ window.onload = function(){
 
         //showing popup
         const popup = document.getElementById(popupId);
-        popup.style.display="block";
+        popup.style.display="flex";
 
         //aplying blure to content
         const content = document.getElementById("content");

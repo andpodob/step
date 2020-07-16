@@ -20,8 +20,17 @@ p {
   grid-template-rows: 50% 50%;
   width: 54vw;
   height: 36vw;
-  grid-gap: 8px;
-    
+  grid-gap: 8px; 
+}
+
+#popup-4 {
+    width: 18vw;
+    height: 30vw;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 220px;
+    max-height: 350px;
 }
 
 .popup {
@@ -46,6 +55,7 @@ p {
     width: 50%;
     height: 50%;
 }
+
 .tile {
     display: flex;
     flex-direction: column;
@@ -110,5 +120,3 @@ p {
 #greeting-container {
   margin-top: 20px;
 }
-
-​
