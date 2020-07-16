@@ -1,5 +1,19 @@
-p {
+.icon-container p {
     white-space: nowrap;
+}
+
+.carousel-item {
+    height: 100%;
+}
+
+.carousel-inner {
+    height: 100%;
+}
+
+.carousel-inner img {
+    margin: auto;
+    margin-bottom: 5px;
+    max-height: 35vh;
 }
 
 #popup-background {
@@ -33,6 +47,22 @@ p {
     max-height: 350px;
 }
 
+#hobbySlides {
+    height: 60%;
+}
+
+
+#popup-6 {
+    flex-direction: column;
+    height: max-content;
+}
+
+#popup-6 p {
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
 .popup {
     width: 50vw;
     height: 50vh;
@@ -43,6 +73,7 @@ p {
     border-style: solid;
     border-width: 1px;
     border-color: black;
+    padding: 10px;
 }
 
 .material-icons.md-48 { font-size: 48px; }
