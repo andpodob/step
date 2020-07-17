@@ -151,3 +151,8 @@
 #greeting-container {
   margin-top: 20px;
 }
+
+.carousel-control-next,
+.carousel-control-prev {
+    filter: invert(50%);
+}
