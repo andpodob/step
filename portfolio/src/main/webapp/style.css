@@ -1,5 +1,19 @@
-p {
+.icon-container p {
     white-space: nowrap;
+}
+
+.carousel-item {
+    height: 100%;
+}
+
+.carousel-inner {
+    height: 100%;
+}
+
+.carousel-inner img {
+    margin: auto;
+    margin-bottom: 5px;
+    max-height: 35vh;
 }
 
 #popup-background {
@@ -20,8 +34,33 @@ p {
   grid-template-rows: 50% 50%;
   width: 54vw;
   height: 36vw;
-  grid-gap: 8px;
-    
+  grid-gap: 8px; 
+}
+
+#popup-4 {
+    width: 18vw;
+    height: 30vw;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 220px;
+    max-height: 350px;
+}
+
+#hobbySlides {
+    height: 60%;
+}
+
+
+#popup-6 {
+    flex-direction: column;
+    height: max-content;
+}
+
+#popup-6 p {
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .popup {
@@ -34,6 +73,7 @@ p {
     border-style: solid;
     border-width: 1px;
     border-color: black;
+    padding: 10px;
 }
 
 .material-icons.md-48 { font-size: 48px; }
@@ -46,6 +86,7 @@ p {
     width: 50%;
     height: 50%;
 }
+
 .tile {
     display: flex;
     flex-direction: column;
@@ -111,4 +152,7 @@ p {
   margin-top: 20px;
 }
 
-​
+.carousel-control-next,
+.carousel-control-prev {
+    filter: invert(50%);
+}
