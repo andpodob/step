@@ -18,13 +18,14 @@
 
 .contact-container{
     display: flex; 
-    justify-content: center; 
+    justify-content: left; 
     align-items: center;
+    width: 100%;
 }
 
 .contact-container p {
     margin: 0;
-    padding: 0;
+    padding: 10px;
 }
 
 #popup-background {
