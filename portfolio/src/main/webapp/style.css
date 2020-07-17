@@ -16,6 +16,18 @@
     max-height: 35vh;
 }
 
+.contact-container{
+    display: flex; 
+    justify-content: left; 
+    align-items: center;
+    width: 100%;
+}
+
+.contact-container p {
+    margin: 0;
+    padding: 10px;
+}
+
 #popup-background {
     width: 100vw;
     height: 100vh;
@@ -35,6 +47,14 @@
   width: 54vw;
   height: 36vw;
   grid-gap: 8px; 
+}
+
+#popup-3 {
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: fit-content;
+    height: 200px;
 }
 
 #popup-4 {
