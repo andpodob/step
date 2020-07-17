@@ -50,9 +50,12 @@
 }
 
 #popup-1 {
-    height: fit-content;
+    height: fit-content; 
 }
-
+#popup-1 img{
+    height: 50vh;
+    margin: auto;
+}
 #popup-1 img, #popup-1 p,  #popup-1 h3{
     padding: 10px;
 }
