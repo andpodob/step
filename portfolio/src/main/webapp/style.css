@@ -45,6 +45,8 @@
   grid-template-columns: 33% 33% 33%;
   grid-template-rows: 50% 50%;
   width: 54vw;
+  max-width: 675px;
+  max-height: 450px;
   height: 36vw;
   grid-gap: 8px; 
 }
