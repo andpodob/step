@@ -45,8 +45,27 @@
   grid-template-columns: 33% 33% 33%;
   grid-template-rows: 50% 50%;
   width: 54vw;
+  max-width: 675px;
+  max-height: 450px;
   height: 36vw;
   grid-gap: 8px; 
+}
+
+#popup-1 {
+    height: fit-content; 
+}
+#popup-1 img{
+    height: 50vh;
+    margin: auto;
+}
+#popup-1 img, #popup-1 p,  #popup-1 h3{
+    padding: 10px;
+}
+
+#popup-2, #popup-5 {
+    padding-right: 15px;
+    width: fit-content;
+    height: fit-content;
 }
 
 #popup-3 {
@@ -54,7 +73,7 @@
     justify-content: space-around;
     align-items: center;
     width: fit-content;
-    height: 200px;
+    height: 150px;
 }
 
 #popup-4 {
