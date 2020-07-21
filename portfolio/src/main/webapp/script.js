@@ -19,11 +19,49 @@ function getHelloContent(){
     })
 }
 
+function createCommentElement(commentJson){
+    const commentContainer = document.createElement('div');
+    commentContainer.classList.add("comment-container");
+    
+    const author = document.createElement("h5");
+    const date = document.createElement("h7");
+    const comment = document.createElement("p");
+
+    const authorText = document.createTextNode(commentJson.author); 
+    const dateText = document.createTextNode(commentJson.date); 
+    const commentText = document.createTextNode(commentJson.comment);
+
+    author.appendChild(authorText);
+    date.appendChild(dateText);
+    comment.appendChild(commentText);
+
+    commentContainer.appendChild(author); 
+    commentContainer.appendChild(date);
+    commentContainer.appendChild(comment);
+
+    return commentContainer;
+}
+
+function getComments(){
+    fetch("/data")
+    .then(response => response.json())
+    .then((comments) => {
+        const commentList = document.getElementById('comments');
+        let entry = null;
+        for(let i in comments){
+            entry = document.createElement('li');
+            comment = createCommentElement(comments[i]);
+            entry.appendChild(comment);
+            commentList.appendChild(entry);
+        }
+    });
+}
 
 window.onload = function(){
 
     //at the begining we call function that fetches data form server
     getHelloContent();
+    getComments();
 
     const popupBackground = document.getElementById("popup-background")
 
