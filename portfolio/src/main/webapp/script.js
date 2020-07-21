@@ -12,7 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//fetching function
+function getHelloContent(){
+    fetch("/data").then(response => response.text()).then((data) =>{
+        document.getElementById("server-data").innerText = data;
+    })
+}
+
+
 window.onload = function(){
+
+    //at the begining we call function that fetches data form server
+    getHelloContent();
+
     const popupBackground = document.getElementById("popup-background")
 
     const tiles = document.getElementsByClassName("tile");
