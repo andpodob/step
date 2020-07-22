@@ -22,18 +22,14 @@ public final class Comment {
     private final Date date;
     private final String comment;
 
-
-
     public Comment(String author, String comment, Date publishDate){
         this.author = author;
         this.comment = comment;
-        this.date = publishDate;
+        this.timestamp = new Timestamp(publishDate.getTime());
     }
 
     public Comment(String author, String comment){
-        this.author = author;
-        this.comment = comment;
-        this.date = new Date();
+        this(author, comment, new Date());
     }
 
     public String getAuthor(){
