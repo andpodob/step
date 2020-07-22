@@ -44,6 +44,30 @@ public class DataServlet extends HttpServlet {
     response.getWriter().println(json);
   }
 
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+      //reading parameters from POST request
+      String userName = getParameter(request, "user-name", "anonym");
+      String comment = getParameter(request, "comment", "empty");
+
+      //constructing comment object and saving in comments
+      Comment commentObj = new Comment(userName, comment);
+      comments.add(commentObj);
+
+
+      //redirecting back to index.html
+      // Redirect back to the HTML page.
+      response.sendRedirect("/index.html");
+  }
+
+  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
+    String value = request.getParameter(name);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
+  }
+
   private String convertCommentsToJson(ArrayList<Comment> comments){
     Gson gson = new Gson();
     Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();

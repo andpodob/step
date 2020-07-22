@@ -14,12 +14,13 @@
 
 package com.google.sps.data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public final class Comment {
     
     private final String author; //later class Author can be introduced - to discuss with hosts
-    private final Date date;
+    private final Timestamp timestamp;
     private final String comment;
 
     public Comment(String author, String comment, Date publishDate){
@@ -40,7 +41,7 @@ public final class Comment {
         return this.comment;
     }
 
-    public Date getDate(){
-        return this.date;
+    public Timestamp getTimestamp(){
+        return this.timestamp;
     }
 }
