@@ -136,9 +136,16 @@
       </div>
       <div>
         <div id="comments-container">
-            <ul id="comments">
+            <ul id="comments" action="/data" method="POST">
             </ul>
         </div>
+        <form>
+                <label for="user-name">First name: </label>
+                <input type="text" id="user-name" name="user-name"><br>
+                <label for="comment">Comment: </label>
+                <input type="text" id="comment" name="comment"><br>
+                <input type="submit"/>
+        </form>
       </div>
     </div>
 

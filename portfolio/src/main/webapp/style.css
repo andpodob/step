@@ -182,9 +182,13 @@
   margin-left: auto;
   margin-right: auto;
   width: 100vw;
-  height: 100vh;
+  /* height: 100vh; */
   filter: blur(0px);
   -webkit-filter: blur(0px);
+}
+
+#content h1 {
+    margin-top: 30px;
 }
 
 #greeting-container {
@@ -196,9 +200,12 @@
     border-width: 1px;
     border-color: #080808;
     width: 54vw;
-    height: fit-content;
+    max-width: 675px;
+    height: 30vh;
     margin: 10px;
     padding-top: 20px;
+    margin-top: 30px;
+    overflow: scroll;
 }
 
 .carousel-control-next,
