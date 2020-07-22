@@ -28,7 +28,7 @@ function createCommentElement(commentJson){
     const comment = document.createElement("p");
 
     const authorText = document.createTextNode(commentJson.author); 
-    const dateText = document.createTextNode(commentJson.date); 
+    const dateText = document.createTextNode(commentJson.timestamp); 
     const commentText = document.createTextNode(commentJson.comment);
 
     author.appendChild(authorText);
