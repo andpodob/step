@@ -23,8 +23,6 @@ public final class Comment {
     private final Timestamp timestamp;
     private final String comment;
 
-
-
     public Comment(String author, String comment, Date publishDate){
         this.author = author;
         this.comment = comment;
@@ -32,11 +30,7 @@ public final class Comment {
     }
 
     public Comment(String author, String comment){
-        this.author = author;
-        this.comment = comment;
-        //obtaining timestamp
-        Date date = new Date();
-        this.timestamp = new Timestamp(date.getTime());
+        this(author, comment, new Date());
     }
 
     public String getAuthor(){
