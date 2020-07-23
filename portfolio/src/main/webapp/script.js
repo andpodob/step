@@ -12,7 +12,66 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//fetching function
+// function getHelloContent(){
+//     fetch("/data").then(response => response.text()).then((data) =>{
+//         document.getElementById("server-data").innerText = data;
+//     })
+// }
+
+function getLocalTime(timestamp){
+    const date = new Date(timestamp);
+    const localDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
+
+    localDate.setHours(date.getHours() - date.getTimezoneOffset() / 60);
+
+    return localDate; 
+}
+
+function createCommentElement(commentJson){
+    const commentContainer = document.createElement('div');
+    commentContainer.classList.add("comment-container");
+    
+    const author = document.createElement("h5");
+    const date = document.createElement("h7");
+    const comment = document.createElement("p");
+
+    const authorText = document.createTextNode(commentJson.author); 
+    const dateText = document.createTextNode(getLocalTime(commentJson.timestamp)); 
+    const commentText = document.createTextNode(commentJson.comment);
+
+    author.appendChild(authorText);
+    date.appendChild(dateText);
+    comment.appendChild(commentText);
+
+    commentContainer.appendChild(author); 
+    commentContainer.appendChild(date);
+    commentContainer.appendChild(comment);
+
+    return commentContainer;
+}
+
+function getComments(){
+    fetch("/data")
+    .then(response => response.json())
+    .then((comments) => {
+        const commentList = document.getElementById('comments');
+        let entry = null;
+        for(let i in comments){
+            entry = document.createElement('li');
+            comment = createCommentElement(comments[i]);
+            entry.appendChild(comment);
+            commentList.appendChild(entry);
+        }
+    });
+}
+
 window.onload = function(){
+
+    //at the begining we call function that fetches data form server
+    // getHelloContent();
+    getComments();
+
     const popupBackground = document.getElementById("popup-background")
 
     const tiles = document.getElementsByClassName("tile");
