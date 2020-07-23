@@ -14,23 +14,25 @@
 
 package com.google.sps.data;
 
-import java.sql.Timestamp;
+import com.google.appengine.api.datastore.Entity;
+// import java.sql.Timestamp;
 import java.util.Date;
 
 public final class Comment {
     
     private final String author; //later class Author can be introduced - to discuss with hosts
-    private final Timestamp timestamp;
+    private final long timestamp;
     private final String comment;
 
-    public Comment(String author, String comment, Date publishDate){
+    public Comment(String author, String comment, long timestamp){
         this.author = author;
         this.comment = comment;
-        this.timestamp = new Timestamp(publishDate.getTime());
+        // this.timestamp = new Timestamp(publishDate.getTime());
+        this.timestamp = timestamp;
     }
 
     public Comment(String author, String comment){
-        this(author, comment, new Date());
+        this(author, comment, System.currentTimeMillis());
     }
 
     public String getAuthor(){
@@ -41,7 +43,16 @@ public final class Comment {
         return this.comment;
     }
 
-    public Timestamp getTimestamp(){
+    public long getTimestamp(){
         return this.timestamp;
+    }
+
+    public Entity toDatastoreEntity(){
+        Entity entity = new Entity("Comment");
+        entity.setProperty("user-name", this.author);
+        entity.setProperty("timestamp", this.timestamp);
+        entity.setProperty("comment", this.comment);
+
+        return entity;
     }
 }

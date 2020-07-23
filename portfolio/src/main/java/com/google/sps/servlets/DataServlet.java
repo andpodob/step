@@ -15,6 +15,12 @@
 package com.google.sps.servlets;
 
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.sps.data.Comment;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
@@ -33,6 +39,17 @@ public class DataServlet extends HttpServlet {
   
   private ArrayList<Comment> comments = new ArrayList<Comment>();
 
+  //load data from datastore to local memory
+  @Override
+   public void init() {
+      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+      Query query = new Query("Comment").addSort("timestamp", SortDirection.ASCENDING);
+      PreparedQuery results = datastore.prepare(query);
+      for (Entity entity : results.asIterable()) {
+        comments.add(entityToComment(entity));
+      }
+   }
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
     String json = convertCommentsToJson(this.comments);
@@ -50,6 +67,8 @@ public class DataServlet extends HttpServlet {
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);
 
+      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+      datastore.put(commentObj.toDatastoreEntity());
 
       //redirecting back to index.html
       // Redirect back to the HTML page.
@@ -69,5 +88,12 @@ public class DataServlet extends HttpServlet {
     Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();
     String json = gson.toJson(comments, typeOfComments);
     return json;
+  }
+
+  private Comment entityToComment(Entity entity){
+    String comment = (String)entity.getProperty("comment");
+    String userName = (String)entity.getProperty("user-name");
+    long timestamp = (Long)entity.getProperty("timestamp");
+    return new Comment(userName, comment, timestamp);
   }
 }

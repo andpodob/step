@@ -12,20 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//fetching function
-// function getHelloContent(){
-//     fetch("/data").then(response => response.text()).then((data) =>{
-//         document.getElementById("server-data").innerText = data;
-//     })
-// }
-
 function getLocalTime(timestamp){
-    const date = new Date(timestamp);
-    const localDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
-
-    localDate.setHours(date.getHours() - date.getTimezoneOffset() / 60);
-
-    return localDate; 
+    //turns out that Date automatically aplies timezone shift when reading timestamp
+    return new Date(timestamp); 
 }
 
 function createCommentElement(commentJson){
@@ -61,7 +50,6 @@ function getComments(){
             entry = document.createElement('li');
             comment = createCommentElement(comments[i]);
             entry.appendChild(comment);
-            // commentList.appendChild(entry);
             commentList.insertBefore(entry, commentList.firstChild);
         }
     });
