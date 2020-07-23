@@ -31,11 +31,7 @@ import com.google.gson.reflect.TypeToken;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
   
-  private ArrayList<Comment> comments = new ArrayList<Comment>(Arrays.asList(
-      new Comment("user1", "Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur"),
-      new Comment("user2", "Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur"),
-      new Comment("user3","Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur")
-    ));
+  private ArrayList<Comment> comments = new ArrayList<Comment>();
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    

@@ -61,7 +61,8 @@ function getComments(){
             entry = document.createElement('li');
             comment = createCommentElement(comments[i]);
             entry.appendChild(comment);
-            commentList.appendChild(entry);
+            // commentList.appendChild(entry);
+            commentList.insertBefore(entry, commentList.firstChild);
         }
     });
 }

@@ -43,6 +43,7 @@
           <!-- TODO: set project ID. -->
           <deploy.projectId>YOUR_PROJECT_ID_HERE</deploy.projectId>
           <deploy.version>1</deploy.version>
+          <port>8181</port>
         </configuration>
       </plugin>
     </plugins>
