@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const maxLong =9223372036854775807;
+
+var newestSent = 0;
+var oldestSent = maxLong;
+
 function getLocalTime(timestamp){
     //turns out that Date automatically aplies timezone shift when reading timestamp
     return new Date(timestamp); 
@@ -66,7 +71,7 @@ function getNewestComments(){
     });
 }
 
-function newestCurrentComments(){
+function getCurrentComments(){
     fetch("/data?comments=current")
     .then(response => response.json())
     .then((comments) => {
@@ -75,18 +80,22 @@ function newestCurrentComments(){
 }
 
 function nextComments(){
-    fetch("/data?comments=next")
+    fetch("/data?comments=next&oldest="+oldestSent+"&newest="+newestSent)
     .then(response => response.json())
     .then((comments) => {
         populateCommentsList(comments);
+        newestSent = comments[comments.length - 1].timestamp;
+        oldestSent = comments[0].timestamp;
     });
 }
 
 function prevComments(){
-    fetch("/data?comments=prev")
+    fetch("/data?comments=prev&oldest="+oldestSent+"&newest="+newestSent)
     .then(response => response.json())
     .then((comments) => {
         populateCommentsList(comments);
+        newestSent = comments[comments.length - 1].timestamp;
+        oldestSent = comments[0].timestamp;
     });
 }
 

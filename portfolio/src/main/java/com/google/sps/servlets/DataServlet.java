@@ -34,17 +34,26 @@ public class DataServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
     //reading GET request max-comments parameter to determine how much comments include in the response
     String commentsAction = getParameter(request, "comments", "current");
+    String newestStr = getParameter(request, "newest", "");
+    String oldestStr = getParameter(request, "oldest", "");
     String jsonArray = "";
+    System.out.println(newestStr);
+    System.out.println(oldestStr);
+    long oldest = Long.MAX_VALUE;
+    long newest = 0;
+    try{
+      oldest = Long.parseLong(oldestStr);
+      newest = Long.parseLong(newestStr);
+    }catch(NumberFormatException e){
+      System.out.println("Cant parse");
+    }
 
     switch(commentsAction){
       case "next":
-        jsonArray = comments.nextChunk();
+        jsonArray = comments.nextChunk(oldest);
       break;
       case "prev":
-        jsonArray = comments.prevChunk();
-      break;
-      case "current":
-        jsonArray = comments.currentChunk();
+        jsonArray = comments.prevChunk(newest);
       break;
       case "newest":
         jsonArray = comments.newestChunk();
