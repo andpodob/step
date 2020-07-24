@@ -21,7 +21,7 @@ import java.util.Date;
 public final class Comment {
     
     private final String author; //later class Author can be introduced - to discuss with hosts
-    private final long timestamp;
+    private final Long timestamp;
     private final String comment;
 
     public Comment(String author, String comment, long timestamp){
@@ -43,7 +43,7 @@ public final class Comment {
         return this.comment;
     }
 
-    public long getTimestamp(){
+    public Long getTimestamp(){
         return this.timestamp;
     }
 

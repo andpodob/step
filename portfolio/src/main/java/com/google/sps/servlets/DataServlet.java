@@ -17,42 +17,40 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.sps.data.Comment;
+import com.google.sps.data.CommentsList;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import com.google.gson.Gson;
-import java.lang.reflect.Type;
-import com.google.gson.reflect.TypeToken;
+
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
-  
-  private ArrayList<Comment> comments = new ArrayList<Comment>();
 
-  //load data from datastore to local memory
+  private CommentsList comments; 
   @Override
    public void init() {
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Query query = new Query("Comment").addSort("timestamp", SortDirection.ASCENDING);
-      PreparedQuery results = datastore.prepare(query);
-      for (Entity entity : results.asIterable()) {
-        comments.add(entityToComment(entity));
-      }
+     //loading 5-comments on init
+    comments = new CommentsList(5);
    }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
-    String json = convertCommentsToJson(this.comments);
+    //reading GET request max-comments parameter to determine how much comments include in the response
+    String value = getParameter(request, "max-comments", "5");
+    int maxComments;
+    try{
+      maxComments = Integer.parseInt(value);
+    }catch(NumberFormatException e){
+      maxComments = 5;
+    }
+    
+    System.out.println(maxComments);
+
+    String json = comments.asJsonArray();
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
@@ -81,19 +79,5 @@ public class DataServlet extends HttpServlet {
       return defaultValue;
     }
     return value;
-  }
-
-  private String convertCommentsToJson(ArrayList<Comment> comments){
-    Gson gson = new Gson();
-    Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();
-    String json = gson.toJson(comments, typeOfComments);
-    return json;
-  }
-
-  private Comment entityToComment(Entity entity){
-    String comment = (String)entity.getProperty("comment");
-    String userName = (String)entity.getProperty("user-name");
-    long timestamp = (Long)entity.getProperty("timestamp");
-    return new Comment(userName, comment, timestamp);
   }
 }

@@ -41,7 +41,7 @@ function createCommentElement(commentJson){
 }
 
 function getComments(){
-    fetch("/data")
+    fetch("/data?max-comments=10")
     .then(response => response.json())
     .then((comments) => {
         const commentList = document.getElementById('comments');
