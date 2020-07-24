@@ -15,8 +15,7 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
-// import java.sql.Timestamp;
-import java.util.Date;
+
 
 public final class Comment {
     
@@ -47,7 +46,7 @@ public final class Comment {
         return this.timestamp;
     }
 
-    public Entity toDatastoreEntity(){
+    public Entity asDatastoreEntity(){
         Entity entity = new Entity("Comment");
         entity.setProperty("user-name", this.author);
         entity.setProperty("timestamp", this.timestamp);

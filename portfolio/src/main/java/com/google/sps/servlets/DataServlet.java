@@ -15,8 +15,6 @@
 package com.google.sps.servlets;
 
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.sps.data.Comment;
 import com.google.sps.data.CommentsList;
 import java.io.IOException;
@@ -30,29 +28,31 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private CommentsList comments; 
-  @Override
-   public void init() {
-     //loading 5-comments on init
-    comments = new CommentsList(5);
-   }
+  private CommentsList comments = new CommentsList(); 
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
     //reading GET request max-comments parameter to determine how much comments include in the response
-    String value = getParameter(request, "max-comments", "5");
-    int maxComments;
-    try{
-      maxComments = Integer.parseInt(value);
-    }catch(NumberFormatException e){
-      maxComments = 5;
-    }
-    
-    System.out.println(maxComments);
+    String commentsAction = getParameter(request, "comments", "current");
+    String jsonArray = "";
 
-    String json = comments.asJsonArray();
+    switch(commentsAction){
+      case "next":
+        jsonArray = comments.nextChunk();
+      break;
+      case "prev":
+        jsonArray = comments.prevChunk();
+      break;
+      case "current":
+        jsonArray = comments.currentChunk();
+      break;
+      case "newest":
+        jsonArray = comments.newestChunk();
+      break;
+    }
+
     response.setContentType("application/json;");
-    response.getWriter().println(json);
+    response.getWriter().println(jsonArray);
   }
 
   @Override
@@ -64,9 +64,6 @@ public class DataServlet extends HttpServlet {
       //constructing comment object and saving in comments
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);
-
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      datastore.put(commentObj.toDatastoreEntity());
 
       //redirecting back to index.html
       // Redirect back to the HTML page.

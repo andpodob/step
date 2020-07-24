@@ -40,18 +40,53 @@ function createCommentElement(commentJson){
     return commentContainer;
 }
 
-function getComments(){
-    fetch("/data?max-comments=10")
+function removeAllChild(parent){
+    while (parent.firstChild) {
+        parent.removeChild(parent.lastChild);
+    }
+}
+
+function populateCommentsList(comments){
+    const commentList = document.getElementById('comments');
+    removeAllChild(commentList);
+    let entry = null;
+    for(let i in comments){
+        entry = document.createElement('li');
+        comment = createCommentElement(comments[i]);
+        entry.appendChild(comment);
+        commentList.insertBefore(entry, commentList.firstChild);
+    }
+}
+
+function getNewestComments(){
+    fetch("/data?comments=newest")
     .then(response => response.json())
     .then((comments) => {
-        const commentList = document.getElementById('comments');
-        let entry = null;
-        for(let i in comments){
-            entry = document.createElement('li');
-            comment = createCommentElement(comments[i]);
-            entry.appendChild(comment);
-            commentList.insertBefore(entry, commentList.firstChild);
-        }
+        populateCommentsList(comments);
+    });
+}
+
+function newestCurrentComments(){
+    fetch("/data?comments=current")
+    .then(response => response.json())
+    .then((comments) => {
+        populateCommentsList(comments);
+    });
+}
+
+function nextComments(){
+    fetch("/data?comments=next")
+    .then(response => response.json())
+    .then((comments) => {
+        populateCommentsList(comments);
+    });
+}
+
+function prevComments(){
+    fetch("/data?comments=prev")
+    .then(response => response.json())
+    .then((comments) => {
+        populateCommentsList(comments);
     });
 }
 
@@ -59,7 +94,7 @@ window.onload = function(){
 
     //at the begining we call function that fetches data form server
     // getHelloContent();
-    getComments();
+    getNewestComments();
 
     const popupBackground = document.getElementById("popup-background")
 
