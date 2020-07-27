@@ -2,7 +2,6 @@ package com.google.sps.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -18,16 +17,10 @@ import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 
 public class CommentsList {
-    private int chunkSize;
     private DatastoreService datastore;
 
     public CommentsList(){
-        this(5);
-    }
-
-    public CommentsList(int chunkSize){
         datastore = DatastoreServiceFactory.getDatastoreService();
-        this.chunkSize = chunkSize;
     }
 
     public String newestChunk(int chunkSize){
