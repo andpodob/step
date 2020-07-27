@@ -16,32 +16,64 @@ package com.google.sps.servlets;
 
 
 import com.google.sps.data.Comment;
+import com.google.sps.data.CommentsList;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import com.google.gson.Gson;
-import java.lang.reflect.Type;
-import com.google.gson.reflect.TypeToken;
+
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
-  
-  private ArrayList<Comment> comments = new ArrayList<Comment>(Arrays.asList(
-      new Comment("user1", "Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur"),
-      new Comment("user2", "Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur"),
-      new Comment("user3","Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur Lorem ipsum dolor sit amet, consectetur")
-    ));
+
+  private CommentsList comments = new CommentsList(); 
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
-    String json = convertCommentsToJson(this.comments);
+    //reading GET request max-comments parameter to determine how much comments include in the response
+    String commentsAction = getParameter(request, "comments", "current");
+    String newestStr = getParameter(request, "newest", "");
+    String oldestStr = getParameter(request, "oldest", "");
+    String sizeStr = getParameter(request, "size", "");
+    String jsonArray = "";
+    System.out.println(newestStr);
+    System.out.println(oldestStr);
+    long oldest = Long.MAX_VALUE;
+    long newest = 0;
+    int size = 5;
+    
+    try{
+      oldest = Long.parseLong(oldestStr);
+    }catch(NumberFormatException e){
+      System.out.println("Cant parse oldest");
+    }
+    try{
+      newest = Long.parseLong(newestStr);
+    }catch(NumberFormatException e){
+      System.out.println("Cant parse newest");
+    }
+    try{
+      size = Integer.parseInt(sizeStr);
+    }catch(NumberFormatException e){
+      System.out.println("Cant parse size");
+    }
+
+    switch(commentsAction){
+      case "next":
+        jsonArray = comments.nextChunk(oldest, size);
+      break;
+      case "prev":
+        jsonArray = comments.prevChunk(newest, size);
+      break;
+      case "newest":
+        jsonArray = comments.newestChunk(size);
+      break;
+    }
+
     response.setContentType("application/json;");
-    response.getWriter().println(json);
+    response.getWriter().println(jsonArray);
   }
 
   @Override
@@ -54,7 +86,6 @@ public class DataServlet extends HttpServlet {
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);
 
-
       //redirecting back to index.html
       // Redirect back to the HTML page.
       response.sendRedirect("/index.html");
@@ -66,12 +97,5 @@ public class DataServlet extends HttpServlet {
       return defaultValue;
     }
     return value;
-  }
-
-  private String convertCommentsToJson(ArrayList<Comment> comments){
-    Gson gson = new Gson();
-    Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();
-    String json = gson.toJson(comments, typeOfComments);
-    return json;
   }
 }

@@ -136,15 +136,17 @@
       </div>
       <div>
         <div id="comments-container">
+            <button onclick="prevComments()">Prev</button>
             <ul id="comments" action="/data" method="POST">
             </ul>
+            <button onclick="nextComments()">Next</button>
         </div>
-        <form action="/text" method="POST">
+        <form action="/data" method="POST">
                 <label for="user-name">First name: </label>
                 <input type="text" id="user-name" name="user-name"><br>
                 <label for="comment">Comment: </label>
                 <input type="text" id="comment" name="comment"><br>
-                <input type="submit"/>
+                <input onclick="newestComments()" type="submit"/>
         </form>
       </div>
     </div>
