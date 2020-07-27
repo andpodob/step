@@ -33,9 +33,9 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
     String commentsAction = getParameter(request, "comments", "current");
-    String newestStr = getParameter(request, "newest", "");
-    String oldestStr = getParameter(request, "oldest", "");
-    String sizeStr = getParameter(request, "size", "");
+    String newestStr = getParameter(request, "newest", "0");
+    String oldestStr = getParameter(request, "oldest", "0");
+    String sizeStr = getParameter(request, "size", "0");
     String jsonArray = "";
     long oldest = Long.MAX_VALUE;
     long newest = 0;
@@ -43,15 +43,7 @@ public class DataServlet extends HttpServlet {
     
     try{
       oldest = Long.parseLong(oldestStr);
-    }catch(NumberFormatException e){
-      e.printStackTrace();
-    }
-    try{
       newest = Long.parseLong(newestStr);
-    }catch(NumberFormatException e){
-      e.printStackTrace();
-    }
-    try{
       size = Integer.parseInt(sizeStr);
     }catch(NumberFormatException e){
       e.printStackTrace();
