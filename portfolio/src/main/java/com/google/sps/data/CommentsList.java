@@ -30,14 +30,14 @@ public class CommentsList {
         this.chunkSize = chunkSize;
     }
 
-    public String newestChunk(){
-        return nextChunk(Long.MAX_VALUE);
+    public String newestChunk(int chunkSize){
+        return nextChunk(Long.MAX_VALUE, chunkSize);
     }
 
-    public String nextChunk(long oldestSent){
+    public String nextChunk(long oldestSent, int chunkSize){
         Filter olderThanFilter = new FilterPredicate("timestamp", FilterOperator.LESS_THAN, oldestSent);
         Query query = new Query("Comment").setFilter(olderThanFilter).addSort("timestamp", SortDirection.DESCENDING);
-        Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(this.chunkSize));
+        Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(chunkSize));
         ArrayList<Comment> comments = new ArrayList<Comment>();
         for (Entity entity : results) {
             comments.add(entityToComment(entity));
@@ -48,10 +48,10 @@ public class CommentsList {
         return toJsonArray(comments);
     }
 
-    public String prevChunk(long newestSent){
+    public String prevChunk(long newestSent, int chunkSize){
         Filter newerThanFilter = new FilterPredicate("timestamp", FilterOperator.GREATER_THAN, newestSent);
         Query query = new Query("Comment").setFilter(newerThanFilter).addSort("timestamp", SortDirection.ASCENDING);
-        Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(this.chunkSize));
+        Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(chunkSize));
         ArrayList<Comment> comments = new ArrayList<Comment>();
         for (Entity entity : results) {
             comments.add(entityToComment(entity));

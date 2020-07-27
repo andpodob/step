@@ -36,27 +36,39 @@ public class DataServlet extends HttpServlet {
     String commentsAction = getParameter(request, "comments", "current");
     String newestStr = getParameter(request, "newest", "");
     String oldestStr = getParameter(request, "oldest", "");
+    String sizeStr = getParameter(request, "size", "");
     String jsonArray = "";
     System.out.println(newestStr);
     System.out.println(oldestStr);
     long oldest = Long.MAX_VALUE;
     long newest = 0;
+    int size = 5;
+    
     try{
       oldest = Long.parseLong(oldestStr);
+    }catch(NumberFormatException e){
+      System.out.println("Cant parse oldest");
+    }
+    try{
       newest = Long.parseLong(newestStr);
     }catch(NumberFormatException e){
-      System.out.println("Cant parse");
+      System.out.println("Cant parse newest");
+    }
+    try{
+      size = Integer.parseInt(sizeStr);
+    }catch(NumberFormatException e){
+      System.out.println("Cant parse size");
     }
 
     switch(commentsAction){
       case "next":
-        jsonArray = comments.nextChunk(oldest);
+        jsonArray = comments.nextChunk(oldest, size);
       break;
       case "prev":
-        jsonArray = comments.prevChunk(newest);
+        jsonArray = comments.prevChunk(newest, size);
       break;
       case "newest":
-        jsonArray = comments.newestChunk();
+        jsonArray = comments.newestChunk(size);
       break;
     }
 
