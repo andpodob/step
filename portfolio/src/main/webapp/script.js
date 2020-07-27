@@ -83,9 +83,11 @@ function nextComments(){
     fetch("/data?comments=next&oldest="+oldestSent+"&newest="+newestSent)
     .then(response => response.json())
     .then((comments) => {
-        populateCommentsList(comments);
-        newestSent = comments[comments.length - 1].timestamp;
-        oldestSent = comments[0].timestamp;
+        if(comments.length > 0){
+            populateCommentsList(comments);
+            newestSent = comments[comments.length - 1].timestamp;
+            oldestSent = comments[0].timestamp;
+        }
     });
 }
 
@@ -93,9 +95,11 @@ function prevComments(){
     fetch("/data?comments=prev&oldest="+oldestSent+"&newest="+newestSent)
     .then(response => response.json())
     .then((comments) => {
-        populateCommentsList(comments);
-        newestSent = comments[comments.length - 1].timestamp;
-        oldestSent = comments[0].timestamp;
+        if(comments.length >  0){
+            populateCommentsList(comments);
+            newestSent = comments[comments.length - 1].timestamp;
+            oldestSent = comments[0].timestamp;
+        }
     });
 }
 
