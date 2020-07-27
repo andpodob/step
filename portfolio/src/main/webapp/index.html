@@ -134,7 +134,7 @@
             </div>
            </div>
       </div>
-      <div>
+      <div id="comments-section">
         <div id="comments-container">
             <button onclick="prevComments()">Prev</button>
             <ul id="comments" action="/data" method="POST">
@@ -142,10 +142,10 @@
             <button onclick="nextComments()">Next</button>
         </div>
         <form action="/data" method="POST">
-                <label for="user-name">First name: </label>
+                <label for="user-name">Name: </label>
                 <input type="text" id="user-name" name="user-name"><br>
                 <label for="comment">Comment: </label>
-                <input type="text" id="comment" name="comment"><br>
+                <textarea type="text" id="comment" name="comment"></textarea><br>
                 <input onclick="newestComments()" type="submit"/>
         </form>
       </div>

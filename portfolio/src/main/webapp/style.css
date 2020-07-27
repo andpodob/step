@@ -182,7 +182,6 @@
   margin-left: auto;
   margin-right: auto;
   width: 100vw;
-  /* height: 100vh; */
   filter: blur(0px);
   -webkit-filter: blur(0px);
 }
@@ -196,9 +195,8 @@
 }
 
 #comments-container {
-    border-style: solid;
-    border-width: 1px;
-    border-color: #080808;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     width: 54vw;
     max-width: 675px;
     height: 30vh;
@@ -208,7 +206,53 @@
     overflow: scroll;
 }
 
+#comments-section{
+    margin: auto;
+}
+
 .carousel-control-next,
 .carousel-control-prev {
     filter: invert(50%);
 }
+
+form {
+    width: 54vw;
+    max-width: 675px;
+    margin-left: 10px;
+}
+
+input[type=text], select {
+    width: 100%;
+    padding: 12px 20px; 
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  textarea[type=text], select {
+    width: 100%;
+    padding: 12px 20px; 
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  input[type=submit] {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type=submit]:hover {
+    background-color: #45a049;
+  }
+  
