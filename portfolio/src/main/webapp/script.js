@@ -68,7 +68,7 @@ function createCommentElement(commentJson){
  * Removes all child elements of passed DOM parent element 
  */
 
-function removeAllChild(parent){
+function removeAllChildren(parent){
     while (parent.firstChild) {
         parent.removeChild(parent.lastChild);
     }
@@ -85,7 +85,7 @@ function removeAllChild(parent){
 
 function populateCommentsList(comments){
     const commentList = document.getElementById('comments');
-    removeAllChild(commentList);
+    removeAllChildren(commentList);
     commentsArray = comments;
     let entry = null;
     for(let i in comments){

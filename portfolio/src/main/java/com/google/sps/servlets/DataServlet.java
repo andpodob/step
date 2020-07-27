@@ -32,14 +32,11 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {    
-    //reading GET request max-comments parameter to determine how much comments include in the response
     String commentsAction = getParameter(request, "comments", "current");
     String newestStr = getParameter(request, "newest", "");
     String oldestStr = getParameter(request, "oldest", "");
     String sizeStr = getParameter(request, "size", "");
     String jsonArray = "";
-    System.out.println(newestStr);
-    System.out.println(oldestStr);
     long oldest = Long.MAX_VALUE;
     long newest = 0;
     int size = 5;
@@ -47,17 +44,17 @@ public class DataServlet extends HttpServlet {
     try{
       oldest = Long.parseLong(oldestStr);
     }catch(NumberFormatException e){
-      System.out.println("Cant parse oldest");
+      e.printStackTrace();
     }
     try{
       newest = Long.parseLong(newestStr);
     }catch(NumberFormatException e){
-      System.out.println("Cant parse newest");
+      e.printStackTrace();
     }
     try{
       size = Integer.parseInt(sizeStr);
     }catch(NumberFormatException e){
-      System.out.println("Cant parse size");
+      e.printStackTrace();
     }
 
     switch(commentsAction){
@@ -78,16 +75,12 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-      //reading parameters from POST request
       String userName = getParameter(request, "user-name", "anonym");
       String comment = getParameter(request, "comment", "empty");
 
-      //constructing comment object and saving in comments
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);
 
-      //redirecting back to index.html
-      // Redirect back to the HTML page.
       response.sendRedirect("/index.html");
   }
 
