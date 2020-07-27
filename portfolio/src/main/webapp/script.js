@@ -12,10 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const COMMENTS_SIZE = 5
+const INITIAL_COMMENTS_SIZE = 10
+const MAX_COMMENTS_SIZE = 20
+
+
+var newestSent;
+var oldestSent;
+var commentsArray = [];
+
+/**
+ * 
+ * @param {*} timestamp timestamp to be converted to date in text format
+ * 
+ */
 function getLocalTime(timestamp){
-    //turns out that Date automatically aplies timezone shift when reading timestamp
     return new Date(timestamp); 
 }
+
+/**
+ * 
+ * @param {*} commentJson json comment object with properties {'author', 'timestamp', 'comment'}
+ * 
+ * Creates comment DOM element based passed json comment object.
+ *  
+ */
 
 function createCommentElement(commentJson){
     const commentContainer = document.createElement('div');
@@ -40,26 +61,132 @@ function createCommentElement(commentJson){
     return commentContainer;
 }
 
-function getComments(){
-    fetch("/data")
+/**
+ * 
+ * @param {*} parent parent DOM element that all child elements should be removed
+ * 
+ * Removes all child elements of passed DOM parent element 
+ */
+
+function removeAllChild(parent){
+    while (parent.firstChild) {
+        parent.removeChild(parent.lastChild);
+    }
+}
+
+/**
+ * 
+ * @param {*} comments list of comments that should be displayed
+ * 
+ * This function is used to initiate or refresh comments content, it erases current content and fills comments scroll view
+ * with passed comments.
+ * 
+ */
+
+function populateCommentsList(comments){
+    const commentList = document.getElementById('comments');
+    removeAllChild(commentList);
+    commentsArray = comments;
+    let entry = null;
+    for(let i in comments){
+        entry = document.createElement('li');
+        comment = createCommentElement(comments[i]);
+        entry.appendChild(comment);
+        commentList.insertBefore(entry, commentList.firstChild);
+
+    }
+}
+/**
+ * 
+ * @param {*} comments array of comment objects to be added to commentsArray and to be displayed
+ * @param {*} side indicated if comments should be added on the bottom of array(dispalyed on the bottom of scroll view) or on the top
+ * 
+ * Handles adding comments to 'comments' DOM element and reflects this changes in commentsArray
+ * which consist of abstract comment objects, facilitates testing and obtaining information about 
+ * current state. 
+ * 
+ * Usage:
+ * Pass the comments to be added and side 'top' or 'bottom' to indicate on what side comments should be added
+ */
+function addToCommentsList(comments, side){
+    const commentList = document.getElementById('comments');
+    let entry = null;
+    for(let i in comments){
+        entry = document.createElement('li');
+        comment = createCommentElement(comments[i]);
+        entry.appendChild(comment);
+        if(commentList.childNodes.length >= MAX_COMMENTS_SIZE ){
+            switch (side){
+                case "top":
+                    commentList.insertBefore(entry, commentList.firstChild);
+                    commentList.removeChild(commentList.lastChild);
+                    commentsArray.push(comments[i]);
+                    commentsArray.shift();
+                    break;
+                case "bottom":
+                    commentList.appendChild(entry);
+                    commentList.removeChild(commentList.firstChild);
+                    commentsArray.unshift(comments[i]);
+                    commentsArray.pop();
+                    break;
+            }
+            
+        }else{
+            switch (side){
+                case "top":
+                    commentList.insertBefore(entry, commentList.firstChild);
+                    commentsArray.push(comments[i]);
+                    break;
+                case "bottom":
+                    commentList.appendChild(entry);
+                    commentsArray.unshift(comments[i]);
+                    break;
+            }
+        }
+    }
+}
+
+
+/**
+ * Fetches INITIAL_COMMENTS_SIZE most recent comments and displays them as content.
+ */
+function getNewestComments(){
+    fetch(`/data?comments=newest&size=${INITIAL_COMMENTS_SIZE}`)
     .then(response => response.json())
     .then((comments) => {
-        const commentList = document.getElementById('comments');
-        let entry = null;
-        for(let i in comments){
-            entry = document.createElement('li');
-            comment = createCommentElement(comments[i]);
-            entry.appendChild(comment);
-            commentList.insertBefore(entry, commentList.firstChild);
+        populateCommentsList(comments);
+    });
+}
+
+
+/**
+ * Fetches next COMMENTS_SIZE comments according to oldest currently displayed comment
+ */
+function nextComments(){
+    fetch(`/data?comments=next&oldest=${commentsArray[0].timestamp}&newest=${commentsArray[commentsArray.length-1].timestamp}&size=${COMMENTS_SIZE}`)
+    .then(response => response.json())
+    .then((comments) => {
+        if(comments.length > 0){
+            addToCommentsList(comments.reverse(), "bottom");
+        }
+    });
+}
+
+/**
+ * Fetches previous COMMENTS_SIZE comments according to newest currently displayed comment
+ */
+function prevComments(){
+    fetch(`/data?comments=prev&oldest=${commentsArray[0].timestamp}&newest=${commentsArray[commentsArray.length-1].timestamp}&size=${COMMENTS_SIZE}`)
+    .then(response => response.json())
+    .then((comments) => {
+        if(comments.length >  0){
+            addToCommentsList(comments, "top");
         }
     });
 }
 
 window.onload = function(){
-
-    //at the begining we call function that fetches data form server
-    // getHelloContent();
-    getComments();
+    getNewestComments();
 
     const popupBackground = document.getElementById("popup-background")
 
@@ -69,17 +196,12 @@ window.onload = function(){
         popupBackground.style.display = "flex";
         const tileId = this.id;
 
-        //cutting number from id
         const tileNumber = tileId.replace(/[^0-9]/g, '');
         
-        //generating popup id
         const popupId = "popup-"+tileNumber;
 
-        //showing popup
         const popup = document.getElementById(popupId);
         popup.style.display="flex";
-
-        //aplying blure to content
         const content = document.getElementById("content");
         content.style.filter = "blur(4px)";
         content.style.webkitFilter = "blur(4px)";
@@ -87,16 +209,12 @@ window.onload = function(){
 
     window.onclick = function(event) {
         if (event.target == popupBackground) {
-            //hiding the background
             popupBackground.style.display = "none";
-            
-            //hidding popup
             const popups = document.getElementsByClassName("popup");
             for(var i = 0; i < popups.length; i++){
                 popups[i].style.display = "none";
             }
             
-            //restoring blure property of content
             const content = document.getElementById("content");
             content.style.filter = "blur(0px)";
             content.style.webkitFilter = "blur(0px)";
