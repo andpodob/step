@@ -18,16 +18,10 @@ import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 
 public class CommentsList {
-    private int chunkSize;
     private DatastoreService datastore;
 
     public CommentsList(){
-        this(5);
-    }
-
-    public CommentsList(int chunkSize){
         datastore = DatastoreServiceFactory.getDatastoreService();
-        this.chunkSize = chunkSize;
     }
 
     public String newestChunk(int chunkSize){

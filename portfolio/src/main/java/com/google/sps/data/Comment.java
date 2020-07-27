@@ -19,14 +19,13 @@ import com.google.appengine.api.datastore.Entity;
 
 public final class Comment {
     
-    private final String author; //later class Author can be introduced - to discuss with hosts
+    private final String author;
     private final Long timestamp;
     private final String comment;
 
     public Comment(String author, String comment, long timestamp){
         this.author = author;
         this.comment = comment;
-        // this.timestamp = new Timestamp(publishDate.getTime());
         this.timestamp = timestamp;
     }
 
