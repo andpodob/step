@@ -141,7 +141,14 @@
             </ul>
             <button onclick="nextComments()">Load older</button>
         </div>
-        <form action="/data" method="POST">
+        <div id="login-div">
+            <h4 id="login-message"></h4>
+            <button id="login-button" onclick="">LOG IN</button>
+            <button id="change-nickname-button" onclick="">CHANGE NICKNAME</button>
+            <button id="set-nickname-button" onclick="">SET NICKNAME</button>
+            <button id="logout-button" onclick="">LOG OUT</button>
+        </div>
+        <form id="comment-form" action="/data" method="POST">
                 <label for="user-name">Name: </label>
                 <input type="text" id="user-name" name="user-name"><br>
                 <label for="comment">Comment: </label>

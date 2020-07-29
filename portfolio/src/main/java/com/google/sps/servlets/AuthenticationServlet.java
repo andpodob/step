@@ -27,22 +27,21 @@ public class AuthenticationServlet extends HttpServlet {
         response.setContentType("application/json;");
         UserService userService = UserServiceFactory.getUserService();
         boolean isUserLoggedIn = true;
-        String nickname = getUserNickname(userService.getCurrentUser().getUserId());
-        String logoutUrl = userService.createLogoutURL("/");
+        String userId = null;
+        String nickname = null;
+        String logoutUrl = null;
         String loginUrl = null;
         if(userService.isUserLoggedIn()){
             isUserLoggedIn = true;
-            nickname = getUserNickname(userService.getCurrentUser().getUserId());
+            userId = userService.getCurrentUser().getUserId();
+            nickname = getUserNickname(userId);
             logoutUrl = userService.createLogoutURL("/");
-            loginUrl = null;
         } else {
             String urlToRedirectToAfterUserLogsIn = "/";
             isUserLoggedIn = false;
-            nickname = null;
-            logoutUrl = null;
             loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
         }
-        AuthData authData = new AuthData(isUserLoggedIn, nickname, loginUrl, logoutUrl);
+        AuthData authData = new AuthData(isUserLoggedIn, nickname, loginUrl, logoutUrl, userId);
         String authDataJson = toJson(authData);
         response.getWriter().println(authDataJson);
     }

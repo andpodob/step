@@ -11,11 +11,27 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+const LoginState = {
+    LOGGED_OUT: 'logged_out',
+    LOGGED_IN_NICKNAME_SET: 'logged_in_nickname_set',
+    LOGGED_IN_NICKNAME_NOT_SET: 'logged_in_nickname_not_set'
+}
+
+class AuthData {
+    constructor(loginState, userId, nickname, loginUrl, logoutUrl){
+        this.loginState = loginState;
+        this.userId = userId;
+        this.nickname = nickname;
+        this.loginUrl = loginUrl;
+        this.logoutUrl = logoutUrl;
+    }
+}
+
+
 
 const COMMENTS_SIZE = 5
 const INITIAL_COMMENTS_SIZE = 10
 const MAX_COMMENTS_SIZE = 20
-
 
 var newestSent;
 var oldestSent;
@@ -185,9 +201,80 @@ function prevComments(){
     });
 }
 
+function handleAuthData(authData){
+    let loginState = LoginState.LOGGED_OUT;
+    const nickname = authData.nickname;
+    const userId = authData.userId;
+    const loginUrl = authData.loginUrl;
+    const logoutUrl = authData.logoutUrl;
+
+    if(typeof authData.isUserLoggedIn !== 'undefined' && authData.isUserLoggedIn == false){
+        loginState = LoginState.LOGGED_OUT;
+    }else{
+        if(typeof AuthData.nickname !== 'undefined'){
+            loginState = LoginState.LOGGED_IN_NICKNAME_SET;
+        }else{
+            loginState = LoginState.LOGGED_IN_NICKNAME_NOT_SET;
+        }
+    }
+
+    return new AuthData(loginState, userId, nickname, loginUrl, logoutUrl);
+}
+
+/**
+ * Fetches auth data and then creates AuthData object that can be used to update frontend.
+ * Function returns Promise to enable chaining it with functions that are using AuthData object
+ * e.g manageAuthFrontEnd()
+ */
+function fetchAuthData(){
+    return fetch('/auth')
+    .then(response => response.json())
+    .then((authData) => {
+        return handleAuthData(authData); ;
+    });
+}
+
+/**
+ * Manages displying and hiding DOM elements connected to authentication based on AuthData that stores state of current user authentication
+ */
+function manageAuthFrontEnd(authData){
+    const loginMessage = document.getElementById('login-message');
+    const loginButton = document.getElementById('login-button');
+    const setNicknameButton = document.getElementById('set-nickname-button');
+    const changeNicknameButton = document.getElementById('change-nickname-button');
+    const logoutButton = document.getElementById('logout-button');
+    const commentForm = document.getElementById('comment-form');
+    switch(authData.loginState){
+        case LoginState.LOGGED_OUT:
+            loginMessage.innerHTML = 'In order to leave a comment you need to authenticate.';
+            loginButton.style.display = 'block';
+            logoutButton.style.display = 'none';
+            setNicknameButton.style.display = 'none';
+            changeNicknameButton.style.display = 'none';
+            commentForm.style.display = 'none';
+            break;
+        case LoginState.LOGGED_IN_NICKNAME_SET:
+            loginMessage.innerHTML = `Hi ${authData.nickname}`;
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+            setNicknameButton.style.display = 'none';
+            changeNicknameButton.style.display = 'block';
+            commentForm.style.display = 'block';
+            break;
+        case LoginState.LOGGED_IN_NICKNAME_NOT_SET:
+            loginMessage.innerHTML = `Please set Your nick name in order to leave a comment.`;
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+            setNicknameButton.style.display = 'block';
+            changeNicknameButton.style.display = 'none';
+            commentForm.style.display = 'none';
+            break;
+    }
+}
+
 window.onload = function(){
     getNewestComments();
-
+    fetchAuthData().then((authData) => this.manageAuthFrontEnd(authData));
     const popupBackground = document.getElementById("popup-background")
 
     const tiles = document.getElementsByClassName("tile");
