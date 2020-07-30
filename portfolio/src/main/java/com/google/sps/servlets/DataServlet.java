@@ -54,13 +54,14 @@ public class DataServlet extends HttpServlet {
 
     switch(commentsAction){
       case "next":
-        jsonArray = comments.nextChunk(oldest, size);
+        jsonArray = comments.nextChunk(oldest, size).asJson();
       break;
       case "prev":
-        jsonArray = comments.prevChunk(newest, size);
+        jsonArray = comments.prevChunk(newest, size).asJson();
       break;
       case "newest":
-        jsonArray = comments.newestChunk(size);
+        jsonArray = comments.newestChunk(size).asJson();
+        comments.translateCommetns("en");
       break;
     }
 
