@@ -28,10 +28,18 @@ public class NicknameServlet extends HttpServlet {
     String id = userService.getCurrentUser().getUserId();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity entity = new Entity("UserInfo", id);
-    entity.setProperty("id", id);
-    entity.setProperty("nickname", nickname);
-    // The put() function automatically inserts new data or updates existing data based on ID
+    Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+    PreparedQuery results = datastore.prepare(query);
+    Entity entity = results.asSingleEntity();
+    if(entity != null){
+      entity.setProperty("nickname", nickname);
+    }
+    else{
+      entity = new Entity("UserInfo", id);
+      entity.setProperty("id", id);
+      entity.setProperty("nickname", nickname);
+    }
+
     datastore.put(entity);
 
     response.sendRedirect("/");

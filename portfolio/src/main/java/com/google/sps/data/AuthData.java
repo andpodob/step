@@ -11,13 +11,15 @@ public class AuthData {
     private final String loginUrl;
     private final String logoutUrl;
     private final String userId;
+    private final String email;
 
-    public AuthData(boolean isUserLoggedIn, String nickname, String loginUrl, String logoutUrl, String userId){
+    public AuthData(boolean isUserLoggedIn, String nickname, String loginUrl, String logoutUrl, String userId, String email){
         this.isUserLoggedIn = isUserLoggedIn;
         this.nickname = nickname;
         this.loginUrl = loginUrl;
         this.logoutUrl = logoutUrl;
         this.userId = userId;
+        this.email = email;
     }
 
     public boolean getIsUserLoggedIn(){
@@ -38,5 +40,9 @@ public class AuthData {
 
     public String getUserId(){
         return this.userId;
+    }
+
+    public String getEmail(){
+        return this.email;
     }
 }

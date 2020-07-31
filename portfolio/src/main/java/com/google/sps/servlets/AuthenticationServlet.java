@@ -31,19 +31,41 @@ public class AuthenticationServlet extends HttpServlet {
         String nickname = null;
         String logoutUrl = null;
         String loginUrl = null;
+        String email = null;
         if(userService.isUserLoggedIn()){
             isUserLoggedIn = true;
             userId = userService.getCurrentUser().getUserId();
+            email = userService.getCurrentUser().getEmail();
             nickname = getUserNickname(userId);
             logoutUrl = userService.createLogoutURL("/");
+            updateUserEmail(userId, email);
         } else {
             String urlToRedirectToAfterUserLogsIn = "/";
             isUserLoggedIn = false;
             loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
         }
-        AuthData authData = new AuthData(isUserLoggedIn, nickname, loginUrl, logoutUrl, userId);
+        AuthData authData = new AuthData(isUserLoggedIn, nickname, loginUrl, logoutUrl, userId, email);
         String authDataJson = toJson(authData);
         response.getWriter().println(authDataJson);
+    }
+
+    private void updateUserEmail(String id, String email){
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        Query query =
+            new Query("UserInfo")
+                .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+        PreparedQuery results = datastore.prepare(query);
+        Entity entity = results.asSingleEntity();
+        if(entity != null){
+            entity.setProperty("email", email);
+        }
+        else{
+            entity = new Entity("UserInfo", id);
+            entity.setProperty("id", id);
+            entity.setProperty("email", email);
+        }
+
+        datastore.put(entity);
     }
 
     private String getUserNickname(String id) {
