@@ -14,9 +14,12 @@
 
 package com.google.sps.servlets;
 
-
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
 import com.google.sps.data.CommentsList;
+import com.google.sps.utility.EmailManipulation;
+
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -67,13 +70,18 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    UserService userService = UserServiceFactory.getUserService();
+    if(userService.isUserLoggedIn() && EmailManipulation.getDomain(userService.getCurrentUser().getEmail()).equals("google.com")){
       String userName = getParameter(request, "user-name", "anonym");
       String comment = getParameter(request, "comment", "empty");
 
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);
 
-      response.sendRedirect("/index.html");
+      response.sendRedirect("/");
+    }else{
+      response.sendError(403);
+    }
   }
 
   private String getParameter(HttpServletRequest request, String name, String defaultValue) {

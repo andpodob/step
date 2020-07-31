@@ -141,13 +141,24 @@
             </ul>
             <button onclick="nextComments()">Load older</button>
         </div>
-        <form action="/data" method="POST">
-                <label for="user-name">Name: </label>
-                <input type="text" id="user-name" name="user-name"><br>
+        <div id="login-div">
+            <h4 id="login-message"></h4>
+            <button id="login-button" onclick="">LOG IN</button>
+            <button id="logout-button" onclick="">LOG OUT</button>
+        </div>
+        <form id="comment-form" action="/data" method="POST">
+                <input type="hidden" id="user-name" name="user-name" readonly><br>
                 <label for="comment">Comment: </label>
-                <textarea type="text" id="comment" name="comment"></textarea><br>
+                <textarea type="text" id="comment" name="comment" required></textarea><br>
                 <input onclick="newestComments()" type="submit"/>
         </form>
+        <form id="nickname-form" action="/nickname" method="POST">
+            <label for="nickname">Nickname: </label>
+            <input type="text" id="nickname" name="nickname" required minlength="4" maxlength="20" pattern="^[a-zA-Z0-9_-]*$"><br>
+            <input type="submit"/>
+        </form>
+        <button id="change-nickname-button" onclick="changeNicknameButtonAction()">CHANGE NICKNAME</button>
+        <button id="cancel-nickname-change-button" onclick="cancelNicknameChangeButtonAction()">Cancel</button>
       </div>
     </div>
 

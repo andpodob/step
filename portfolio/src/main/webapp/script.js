@@ -11,11 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+const LoginState = {
+    BAD_DOMAIN: 'bad_domain',
+    LOGGED_OUT: 'logged_out',
+    LOGGED_IN_NICKNAME_SET: 'logged_in_nickname_set',
+    LOGGED_IN_NICKNAME_NOT_SET: 'logged_in_nickname_not_set'
+}
+
+class AuthData {
+    constructor(loginState, userId, nickname, loginUrl, logoutUrl){
+        this.loginState = loginState;
+        this.userId = userId;
+        this.nickname = nickname;
+        this.loginUrl = loginUrl;
+        this.logoutUrl = logoutUrl;
+    }
+}
+
+
 
 const COMMENTS_SIZE = 5
 const INITIAL_COMMENTS_SIZE = 10
 const MAX_COMMENTS_SIZE = 20
-
 
 var newestSent;
 var oldestSent;
@@ -185,9 +202,159 @@ function prevComments(){
     });
 }
 
+/**
+ * 
+ * @param {*} authData json authentication data fetched from server
+ * 
+ * Based on server response it creates AuthData object that contains login state
+ * LoginState is evaluated based on response:
+ * -if user is not logged in LoginState is obviously LOGGED_OUT
+ * -if user is logged in and the nickname was not contained in response than 
+ *     it means user haven't set nickname yet hence the loginState is LOGGED_IN_NICKNAME_NOT_SET
+ * -if user is logged in and the nickname was send back from server than state is LOGGED_IN_NICKNAME_SET
+ */
+function handleAuthData(authData){
+    let loginState = LoginState.LOGGED_OUT;
+    const nickname = authData.nickname;
+    const userId = authData.userId;
+    const loginUrl = authData.loginUrl;
+    const logoutUrl = authData.logoutUrl;
+
+    if('isUserLoggedIn' in authData && authData.isUserLoggedIn == 'LOGGED_OUT'){
+        loginState = LoginState.LOGGED_OUT;
+    } else if('isUserLoggedIn' in authData  && authData.isUserLoggedIn == 'BAD_DOMAIN'){
+        loginState = LoginState.BAD_DOMAIN;
+    } else{
+        if('nickname' in authData){
+            console.log(authData.nickname)
+            loginState = LoginState.LOGGED_IN_NICKNAME_SET;
+        }else{
+            loginState = LoginState.LOGGED_IN_NICKNAME_NOT_SET;
+        }
+    }
+
+    return new AuthData(loginState, userId, nickname, loginUrl, logoutUrl);
+}
+
+/**
+ * navigates to loginUrl provided by authentication servlet 
+ */
+function login(loginUrl){
+    window.location.href = loginUrl;
+}
+
+/**
+ * navigates to logoutUrl provided by authentication servlet 
+ */
+function logout(logoutUrl){
+    window.location.href = logoutUrl;
+}
+
+/**
+ * hides and shows appropriate elements after clicking change nickname button 
+ */
+function changeNicknameButtonAction(){
+    const changeNicknameButton = document.getElementById('change-nickname-button');
+    const nicknameForm = document.getElementById('nickname-form');
+    const cancelNicknameChangeButton = document.getElementById('cancel-nickname-change-button');
+
+    changeNicknameButton.style.display = 'none';
+    nicknameForm.style.display = 'block';
+    cancelNicknameChangeButton.style.display = 'block';
+}
+
+/**
+ * hides and shows appropriate elements after clicking cancel button 
+ */
+function cancelNicknameChangeButtonAction(){
+    const changeNicknameButton = document.getElementById('change-nickname-button');
+    const nicknameForm = document.getElementById('nickname-form');
+    const cancelNicknameChangeButton = document.getElementById('cancel-nickname-change-button');
+
+    changeNicknameButton.style.display = 'block';
+    nicknameForm.style.display = 'none';
+    cancelNicknameChangeButton.style.display = 'none';
+}
+/**
+ * Fetches auth data and then creates AuthData object that can be used to update frontend.
+ * Function returns Promise to enable chaining it with functions that are using AuthData object
+ * e.g manageAuthFrontEnd()
+ */
+function fetchAuthData(){
+    return fetch('/auth')
+    .then(response => response.json())
+    .then((authData) => {
+        return handleAuthData(authData); ;
+    });
+}
+
+/**
+ * Manages displying and hiding DOM elements connected to authentication based on AuthData that stores state of current user authentication
+ */
+function manageAuthFrontEnd(authData){
+    const loginMessage = document.getElementById('login-message');
+    const loginButton = document.getElementById('login-button');
+    const cancelNicknameChangeButton = document.getElementById('cancel-nickname-change-button');
+    const changeNicknameButton = document.getElementById('change-nickname-button');
+    const logoutButton = document.getElementById('logout-button');
+    const commentForm = document.getElementById('comment-form');
+    const nicknameForm = document.getElementById('nickname-form');
+    const userName = document.getElementById('user-name');
+    switch(authData.loginState){
+        case LoginState.LOGGED_OUT:
+            loginMessage.innerHTML = 'In order to leave a comment you need to authenticate with @google.com account.';
+            loginButton.onclick = (event) => {login(authData.loginUrl);}
+            loginButton.style.display = 'block';
+            logoutButton.style.display = 'none';
+            changeNicknameButton.style.display = 'none';
+            cancelNicknameChangeButton.style.display = 'none';
+            commentForm.style.display = 'none';
+            nicknameForm .style.display = 'none';
+            break;
+        case LoginState.BAD_DOMAIN:
+            loginMessage.innerHTML = 'You are logged in domain other than google.com';
+            logoutButton.onclick = (event) => {login(authData.logoutUrl);}
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+            changeNicknameButton.style.display = 'none';
+            cancelNicknameChangeButton.style.display = 'none';
+            commentForm.style.display = 'none';
+            nicknameForm .style.display = 'none';
+            break;
+        case LoginState.LOGGED_IN_NICKNAME_SET:
+            userName.value = authData.nickname;
+            loginMessage.innerHTML = `Hi ${authData.nickname}`;
+            logoutButton.onclick = (event) => {login(authData.logoutUrl);}
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+            changeNicknameButton.style.display = 'block';
+            cancelNicknameChangeButton.style.display = 'none';
+            commentForm.style.display = 'block';
+            nicknameForm.style.display = 'none';
+            break;
+        case LoginState.LOGGED_IN_NICKNAME_NOT_SET:
+            loginMessage.innerHTML = `Please set Your nick name in order to leave a comment.`;
+            logoutButton.onclick = (event) => {login(authData.logoutUrl);}
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+            changeNicknameButton.style.display = 'none';
+            cancelNicknameChangeButton.style.display = 'none';
+            commentForm.style.display = 'none';
+            nicknameForm .style.display = 'block';
+            break;
+    }
+}
+
+/**
+ * fetches auth data and updates authentication connected part of frontend
+ */
+function updateAuthView(){
+    fetchAuthData().then((authData) => this.manageAuthFrontEnd(authData));
+}
+
 window.onload = function(){
     getNewestComments();
-
+    this.updateAuthView();
     const popupBackground = document.getElementById("popup-background")
 
     const tiles = document.getElementsByClassName("tile");
