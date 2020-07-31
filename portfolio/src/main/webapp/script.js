@@ -207,7 +207,7 @@ function prevComments(){
  * 
  * Based on server response it creates AuthData object that contains login state
  * LoginState is evaluated based on response:
- * -if user is not logged in LoginState if obviously LOGGED_OUT
+ * -if user is not logged in LoginState is obviously LOGGED_OUT
  * -if user is logged in and the nickname was not contained in response than 
  *     it means user haven't set nickname yet hence the loginState is LOGGED_IN_NICKNAME_NOT_SET
  * -if user is logged in and the nickname was send back from server than state is LOGGED_IN_NICKNAME_SET
