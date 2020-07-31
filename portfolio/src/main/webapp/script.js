@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 const LoginState = {
+    BAD_DOMAIN: 'bad_domain',
     LOGGED_OUT: 'logged_out',
     LOGGED_IN_NICKNAME_SET: 'logged_in_nickname_set',
     LOGGED_IN_NICKNAME_NOT_SET: 'logged_in_nickname_not_set'
@@ -219,10 +220,13 @@ function handleAuthData(authData){
     const loginUrl = authData.loginUrl;
     const logoutUrl = authData.logoutUrl;
 
-    if(typeof authData.isUserLoggedIn !== 'undefined' && authData.isUserLoggedIn == false){
+    if('isUserLoggedIn' in authData && authData.isUserLoggedIn == 'LOGGED_OUT'){
         loginState = LoginState.LOGGED_OUT;
-    }else{
-        if(typeof authData.nickname !== 'undefined'){
+    } else if('isUserLoggedIn' in authData  && authData.isUserLoggedIn == 'BAD_DOMAIN'){
+        loginState = LoginState.BAD_DOMAIN;
+    } else{
+        if('nickname' in authData){
+            console.log(authData.nickname)
             loginState = LoginState.LOGGED_IN_NICKNAME_SET;
         }else{
             loginState = LoginState.LOGGED_IN_NICKNAME_NOT_SET;
@@ -298,10 +302,20 @@ function manageAuthFrontEnd(authData){
     const userName = document.getElementById('user-name');
     switch(authData.loginState){
         case LoginState.LOGGED_OUT:
-            loginMessage.innerHTML = 'In order to leave a comment you need to authenticate.';
+            loginMessage.innerHTML = 'In order to leave a comment you need to authenticate with @google.com account.';
             loginButton.onclick = (event) => {login(authData.loginUrl);}
             loginButton.style.display = 'block';
             logoutButton.style.display = 'none';
+            changeNicknameButton.style.display = 'none';
+            cancelNicknameChangeButton.style.display = 'none';
+            commentForm.style.display = 'none';
+            nicknameForm .style.display = 'none';
+            break;
+        case LoginState.BAD_DOMAIN:
+            loginMessage.innerHTML = 'You are logged in domain other than google.com';
+            logoutButton.onclick = (event) => {login(authData.logoutUrl);}
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
             changeNicknameButton.style.display = 'none';
             cancelNicknameChangeButton.style.display = 'none';
             commentForm.style.display = 'none';

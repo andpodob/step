@@ -6,14 +6,14 @@ package com.google.sps.data;
 
 public class AuthData {
     
-    private final boolean isUserLoggedIn;
+    private final String isUserLoggedIn;
     private final String nickname;
     private final String loginUrl;
     private final String logoutUrl;
     private final String userId;
     private final String email;
 
-    public AuthData(boolean isUserLoggedIn, String nickname, String loginUrl, String logoutUrl, String userId, String email){
+    public AuthData(String isUserLoggedIn, String nickname, String loginUrl, String logoutUrl, String userId, String email){
         this.isUserLoggedIn = isUserLoggedIn;
         this.nickname = nickname;
         this.loginUrl = loginUrl;
@@ -22,7 +22,7 @@ public class AuthData {
         this.email = email;
     }
 
-    public boolean getIsUserLoggedIn(){
+    public String getIsUserLoggedIn(){
         return this.isUserLoggedIn;
     }
 

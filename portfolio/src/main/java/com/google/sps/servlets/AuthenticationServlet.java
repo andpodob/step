@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import com.google.sps.data.AuthData;
+import com.google.sps.data.Login;
+import com.google.sps.utility.EmailManipulation;
 
 @WebServlet("/auth")
 public class AuthenticationServlet extends HttpServlet {
@@ -26,23 +28,28 @@ public class AuthenticationServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;");
         UserService userService = UserServiceFactory.getUserService();
-        boolean isUserLoggedIn = true;
+        String isUserLoggedIn = Login.LOGGED_OUT.name();
         String userId = null;
         String nickname = null;
         String logoutUrl = null;
         String loginUrl = null;
         String email = null;
-        if(userService.isUserLoggedIn()){
-            isUserLoggedIn = true;
+        if(userService.isUserLoggedIn() && EmailManipulation.getDomain(userService.getCurrentUser().getEmail()).equals("google.com")){
+            isUserLoggedIn = Login.SUCCESSFUL.name();
             userId = userService.getCurrentUser().getUserId();
             email = userService.getCurrentUser().getEmail();
             nickname = getUserNickname(userId);
             logoutUrl = userService.createLogoutURL("/");
             updateUserEmail(userId, email);
         } else {
-            String urlToRedirectToAfterUserLogsIn = "/";
-            isUserLoggedIn = false;
-            loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+            if(userService.isUserLoggedIn() && !EmailManipulation.getDomain(userService.getCurrentUser().getEmail()).equals("google.com")){
+                System.out.println(userService.getCurrentUser().getAuthDomain());
+                logoutUrl = userService.createLogoutURL("/");
+                isUserLoggedIn = Login.BAD_DOMAIN.name();
+            }else{
+                loginUrl = userService.createLoginURL("/");
+                isUserLoggedIn = Login.LOGGED_OUT.name();
+            }
         }
         AuthData authData = new AuthData(isUserLoggedIn, nickname, loginUrl, logoutUrl, userId, email);
         String authDataJson = toJson(authData);
