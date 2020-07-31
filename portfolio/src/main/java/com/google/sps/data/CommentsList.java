@@ -15,7 +15,6 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.cloud.translate.Translate;
-// import com.google.cloud.translate.*;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
@@ -85,6 +84,21 @@ public class CommentsList {
         }.getType();
 
         final String json = gson.toJson(comments, typeOfComments);
+        return json;
+    }
+
+    public String asJson(String targetLanguage) {
+        ArrayList<Comment> translatedComments = new ArrayList<Comment>();
+        final Gson gson = new Gson();
+        final Type typeOfComments = new TypeToken<ArrayList<Comment>>() {
+        }.getType();
+        Translate translate = TranslateOptions.newBuilder().setProjectId("apodob-step-2020").setQuotaProjectId("apodob-step-2020").build().getService();      
+        for(Comment comment : comments){
+            translatedComments.add(new Comment(comment.getAuthor(), 
+                                    translate.translate(comment.getComment(),Translate.TranslateOption.targetLanguage(targetLanguage)).getTranslatedText(),
+                                    comment.getTimestamp()));
+        }
+        final String json = gson.toJson(translatedComments, typeOfComments);
         return json;
     }
 }

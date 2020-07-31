@@ -39,6 +39,7 @@ public class DataServlet extends HttpServlet {
     String newestStr = getParameter(request, "newest", "0");
     String oldestStr = getParameter(request, "oldest", "0");
     String sizeStr = getParameter(request, "size", "0");
+    String language = getParameter(request, "lang", "org");
     String jsonArray = "";
     long oldest = Long.MAX_VALUE;
     long newest = 0;
@@ -54,14 +55,22 @@ public class DataServlet extends HttpServlet {
 
     switch(commentsAction){
       case "next":
-        jsonArray = comments.nextChunk(oldest, size).asJson();
+        if(language.equals("org"))
+          jsonArray = comments.nextChunk(oldest, size).asJson();
+        else
+          jsonArray = comments.nextChunk(oldest, size).asJson(language);
       break;
       case "prev":
-        jsonArray = comments.prevChunk(newest, size).asJson();
+        if(language.equals("org"))
+          jsonArray = comments.prevChunk(newest, size).asJson();
+        else
+          jsonArray = comments.prevChunk(newest, size).asJson(language);
       break;
       case "newest":
-        jsonArray = comments.newestChunk(size).asJson();
-        comments.translateCommetns("en");
+        if(language.equals("org"))
+          jsonArray = comments.newestChunk(size).asJson();
+        else
+          jsonArray = comments.newestChunk(size).asJson(language);
       break;
     }
 

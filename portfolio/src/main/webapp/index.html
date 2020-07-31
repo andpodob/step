@@ -150,7 +150,7 @@
                 <input type="hidden" id="user-name" name="user-name" readonly><br>
                 <label for="comment">Comment: </label>
                 <textarea type="text" id="comment" name="comment" required></textarea><br>
-                <input onclick="newestComments()" type="submit"/>
+                <input onclick="getNewestComments()" type="submit"/>
         </form>
         <form id="nickname-form" action="/nickname" method="POST">
             <label for="nickname">Nickname: </label>
@@ -160,6 +160,13 @@
         <button id="change-nickname-button" onclick="changeNicknameButtonAction()">CHANGE NICKNAME</button>
         <button id="cancel-nickname-change-button" onclick="cancelNicknameChangeButtonAction()">Cancel</button>
       </div>
+      <label for="comments-language">Choose a language for comments:</label>
+        <select onchange="getNewestComments()" name="comments-language" id="comments-language">
+            <option value="org">Orginal</option>
+            <option value="pl">Polish</option>
+            <option value="en">English</option>
+            <option value="de">German</option>
+        </select>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

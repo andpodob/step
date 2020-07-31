@@ -168,7 +168,9 @@ function addToCommentsList(comments, side){
  * Fetches INITIAL_COMMENTS_SIZE most recent comments and displays them as content.
  */
 function getNewestComments(){
-    fetch(`/data?comments=newest&size=${INITIAL_COMMENTS_SIZE}`)
+    const select = document.getElementById("comments-language");
+    const language = select.options[select.selectedIndex].value;
+    fetch(`/data?comments=newest&size=${INITIAL_COMMENTS_SIZE}&lang=${language}`)
     .then(response => response.json())
     .then((comments) => {
         populateCommentsList(comments);
@@ -180,7 +182,9 @@ function getNewestComments(){
  * Fetches next COMMENTS_SIZE comments according to oldest currently displayed comment
  */
 function nextComments(){
-    fetch(`/data?comments=next&oldest=${commentsArray[0].timestamp}&newest=${commentsArray[commentsArray.length-1].timestamp}&size=${COMMENTS_SIZE}`)
+    const select = document.getElementById("comments-language");
+    const language = select.options[select.selectedIndex].value;
+    fetch(`/data?comments=next&oldest=${commentsArray[0].timestamp}&newest=${commentsArray[commentsArray.length-1].timestamp}&size=${COMMENTS_SIZE}&lang=${language}`)
     .then(response => response.json())
     .then((comments) => {
         if(comments.length > 0){
@@ -193,7 +197,10 @@ function nextComments(){
  * Fetches previous COMMENTS_SIZE comments according to newest currently displayed comment
  */
 function prevComments(){
-    fetch(`/data?comments=prev&oldest=${commentsArray[0].timestamp}&newest=${commentsArray[commentsArray.length-1].timestamp}&size=${COMMENTS_SIZE}`)
+    const select = document.getElementById("comments-language");
+    const language = select.options[select.selectedIndex].value;
+    console.log(language);
+    fetch(`/data?comments=prev&oldest=${commentsArray[0].timestamp}&newest=${commentsArray[commentsArray.length-1].timestamp}&size=${COMMENTS_SIZE}&lang=${language}`)
     .then(response => response.json())
     .then((comments) => {
         if(comments.length >  0){
@@ -356,7 +363,6 @@ window.onload = function(){
     getNewestComments();
     this.updateAuthView();
     const popupBackground = document.getElementById("popup-background")
-
     const tiles = document.getElementsByClassName("tile");
 
     const openPopup = function(){
