@@ -1,4 +1,4 @@
-// This class is object representation of data response to clined
+// This class is object representation of data response to clinet
 // side on /auth endpoint
 
 package com.google.sps.data;
