@@ -77,28 +77,21 @@ public class CommentsList {
         System.out.println(translation.getTranslatedText());
         return this;
     }
-
-    public String asJson() {
-        final Gson gson = new Gson();
-        final Type typeOfComments = new TypeToken<ArrayList<Comment>>() {
-        }.getType();
-
-        final String json = gson.toJson(comments, typeOfComments);
-        return json;
-    }
-
+    
     public String asJson(String targetLanguage) {
         ArrayList<Comment> translatedComments = new ArrayList<Comment>();
         final Gson gson = new Gson();
-        final Type typeOfComments = new TypeToken<ArrayList<Comment>>() {
-        }.getType();
-        Translate translate = TranslateOptions.newBuilder().setProjectId("apodob-step-2020").setQuotaProjectId("apodob-step-2020").build().getService();      
-        for(Comment comment : comments){
-            translatedComments.add(new Comment(comment.getAuthor(), 
-                                    translate.translate(comment.getComment(),Translate.TranslateOption.targetLanguage(targetLanguage)).getTranslatedText(),
-                                    comment.getTimestamp()));
-        }
-        final String json = gson.toJson(translatedComments, typeOfComments);
-        return json;
+        final Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();
+        if(targetLanguage.equals("org")){
+            return gson.toJson(comments, typeOfComments);
+        } else{
+            Translate translate = TranslateOptions.newBuilder().setProjectId("apodob-step-2020").setQuotaProjectId("apodob-step-2020").build().getService();      
+            for(Comment comment : comments){
+                translatedComments.add(new Comment(comment.getAuthor(), 
+                                translate.translate(comment.getComment(),Translate.TranslateOption.targetLanguage(targetLanguage)).getTranslatedText(),
+                                comment.getTimestamp()));
+            }
+            return gson.toJson(translatedComments, typeOfComments);
+        }   
     }
 }
