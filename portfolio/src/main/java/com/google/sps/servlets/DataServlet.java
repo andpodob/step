@@ -64,7 +64,7 @@ public class DataServlet extends HttpServlet {
           jsonArray = comments.newestChunk(size).asJson(language);
       break;
     }
-
+    response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json;");
     response.getWriter().println(jsonArray);
   }
@@ -75,6 +75,8 @@ public class DataServlet extends HttpServlet {
     if(userService.isUserLoggedIn() && EmailManipulation.getDomain(userService.getCurrentUser().getEmail()).equals("google.com")){
       String userName = getParameter(request, "user-name", "anonym");
       String comment = getParameter(request, "comment", "empty");
+
+      System.out.println(comment);
 
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);
