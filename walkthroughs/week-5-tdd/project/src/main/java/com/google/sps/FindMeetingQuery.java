@@ -15,9 +15,67 @@
 package com.google.sps;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    ArrayList<TimeRange> busyIntervals = new ArrayList<TimeRange>();
+    ArrayList<TimeRange> freeIntervals = new ArrayList<TimeRange>();
+    ArrayList<TimeRange> importantRanges = new ArrayList<TimeRange>();
+    
+    for(String attendee : request.getAttendees()){
+      for (Event event : events){
+        if(event.getAttendees().contains(attendee)){
+          importantRanges.add(event.getWhen());
+        }
+      }
+    }
+
+    importantRanges.sort(TimeRange.ORDER_BY_START);
+   
+    TimeRange popedRange;
+    for(TimeRange timeRange : importantRanges){
+      if(busyIntervals.size() > 0 && timeRange.overlaps(busyIntervals.get(busyIntervals.size()-1))){
+        popedRange = busyIntervals.get(busyIntervals.size()-1);
+        busyIntervals.remove(busyIntervals.size() - 1);
+        busyIntervals.add(mergeTimeRanges(popedRange, timeRange));
+      }else{
+        busyIntervals.add(timeRange);
+      }
+    }
+
+    int duration;
+    if(busyIntervals.size() > 0 ) {
+      //interval in the beginig
+      duration = busyIntervals.get(0).start();
+      if(duration > 0 && duration >= request.getDuration()) 
+        freeIntervals.add(new TimeRange(TimeRange.START_OF_DAY, busyIntervals.get(0).start()));
+      
+      //intervals in the middle
+      for(int i = 0; i < busyIntervals.size()-1; i++){
+        duration = busyIntervals.get(i+1).start()-busyIntervals.get(i).end();
+        if(duration > 0 && duration >= request.getDuration())
+          freeIntervals.add(new TimeRange(busyIntervals.get(i).end(), busyIntervals.get(i+1).start()-busyIntervals.get(i).end()));
+      }
+      
+      //interval at the end
+      duration = TimeRange.END_OF_DAY - busyIntervals.get(busyIntervals.size()-1).end()+1;
+      if(duration > 0 && duration >= request.getDuration())
+        freeIntervals.add(new TimeRange(busyIntervals.get(busyIntervals.size()-1).end(), TimeRange.END_OF_DAY - busyIntervals.get(busyIntervals.size()-1).end()+1));
+    
+    } else if(request.getDuration() <= TimeRange.WHOLE_DAY.duration()){
+      freeIntervals.add(TimeRange.WHOLE_DAY);
+    }
+
+    return freeIntervals;
   }
+
+  private TimeRange mergeTimeRanges(TimeRange a, TimeRange b){
+    if(a.overlaps(b)){
+      int begin = Math.min(a.start(), b.start()), end = Math.max(a.end(),b.end());
+      return new TimeRange(begin, end-begin);
+    }else{
+      return null;
+    }
+  } 
 }
