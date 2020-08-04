@@ -39,6 +39,7 @@ public class DataServlet extends HttpServlet {
     String newestStr = getParameter(request, "newest", "0");
     String oldestStr = getParameter(request, "oldest", "0");
     String sizeStr = getParameter(request, "size", "0");
+    String language = getParameter(request, "lang", "org");
     String jsonArray = "";
     long oldest = Long.MAX_VALUE;
     long newest = 0;
@@ -54,16 +55,16 @@ public class DataServlet extends HttpServlet {
 
     switch(commentsAction){
       case "next":
-        jsonArray = comments.nextChunk(oldest, size);
+          jsonArray = comments.nextChunk(oldest, size).asJson(language);
       break;
       case "prev":
-        jsonArray = comments.prevChunk(newest, size);
+          jsonArray = comments.prevChunk(newest, size).asJson(language);
       break;
       case "newest":
-        jsonArray = comments.newestChunk(size);
+          jsonArray = comments.newestChunk(size).asJson(language);
       break;
     }
-
+    response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json;");
     response.getWriter().println(jsonArray);
   }
@@ -74,6 +75,8 @@ public class DataServlet extends HttpServlet {
     if(userService.isUserLoggedIn() && EmailManipulation.getDomain(userService.getCurrentUser().getEmail()).equals("google.com")){
       String userName = getParameter(request, "user-name", "anonym");
       String comment = getParameter(request, "comment", "empty");
+
+      System.out.println(comment);
 
       Comment commentObj = new Comment(userName, comment);
       comments.add(commentObj);

@@ -12,63 +12,86 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.cloud.translate.TranslateOptions;
+import com.google.cloud.translate.Translation;
+import com.google.cloud.translate.Translate;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 
 public class CommentsList {
-    private DatastoreService datastore;
+    private final DatastoreService datastore;
 
-    public CommentsList(){
+    private ArrayList<Comment> comments;
+
+    public CommentsList() {
         datastore = DatastoreServiceFactory.getDatastoreService();
     }
 
-    public String newestChunk(int chunkSize){
+    public CommentsList newestChunk(final int chunkSize) {
         return nextChunk(Long.MAX_VALUE, chunkSize);
     }
 
-    public String nextChunk(long oldestSent, int chunkSize){
-        Filter olderThanFilter = new FilterPredicate("timestamp", FilterOperator.LESS_THAN, oldestSent);
-        Query query = new Query("Comment").setFilter(olderThanFilter).addSort("timestamp", SortDirection.DESCENDING);
-        Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(chunkSize));
-        ArrayList<Comment> comments = new ArrayList<Comment>();
-        for (Entity entity : results) {
+    public CommentsList nextChunk(final long oldestSent, final int chunkSize) {
+        final Filter olderThanFilter = new FilterPredicate("timestamp", FilterOperator.LESS_THAN, oldestSent);
+        final Query query = new Query("Comment").setFilter(olderThanFilter).addSort("timestamp",
+                SortDirection.DESCENDING);
+        final Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(chunkSize));
+        comments = new ArrayList<Comment>();
+        for (final Entity entity : results) {
             comments.add(entityToComment(entity));
         }
-        
+
         Collections.sort(comments, (o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()));
 
-        return toJsonArray(comments);
+        return this;
     }
 
-    public String prevChunk(long newestSent, int chunkSize){
-        Filter newerThanFilter = new FilterPredicate("timestamp", FilterOperator.GREATER_THAN, newestSent);
-        Query query = new Query("Comment").setFilter(newerThanFilter).addSort("timestamp", SortDirection.ASCENDING);
-        Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(chunkSize));
-        ArrayList<Comment> comments = new ArrayList<Comment>();
-        for (Entity entity : results) {
+    public CommentsList prevChunk(final long newestSent, final int chunkSize) {
+        final Filter newerThanFilter = new FilterPredicate("timestamp", FilterOperator.GREATER_THAN, newestSent);
+        final Query query = new Query("Comment").setFilter(newerThanFilter).addSort("timestamp",
+                SortDirection.ASCENDING);
+        final Iterable<Entity> results = datastore.prepare(query).asIterable(FetchOptions.Builder.withLimit(chunkSize));
+        comments = new ArrayList<Comment>();
+        for (final Entity entity : results) {
             comments.add(entityToComment(entity));
         }
 
-        return toJsonArray(comments);
+        return this;
     }
 
-    public void add(Comment comment){
+    public void add(final Comment comment) {
         datastore.put(comment.asDatastoreEntity());
     }
 
-    public Comment entityToComment(Entity entity){
-        String comment = (String)entity.getProperty("comment");
-        String userName = (String)entity.getProperty("user-name");
-        Long timestamp = (Long)entity.getProperty("timestamp");
+    public Comment entityToComment(final Entity entity) {
+        final String comment = (String) entity.getProperty("comment");
+        final String userName = (String) entity.getProperty("user-name");
+        final Long timestamp = (Long) entity.getProperty("timestamp");
         return new Comment(userName, comment, timestamp);
     }
+
+    public CommentsList translateCommetns(String targetLanguage) {
+        Translate translate = TranslateOptions.newBuilder().setProjectId("apodob-step-2020").setQuotaProjectId("apodob-step-2020").build().getService();      
+        Translation translation = translate.translate("dzien dobry", Translate.TranslateOption.targetLanguage(targetLanguage));
+        System.out.println(translation.getTranslatedText());
+        return this;
+    }
     
-    private String toJsonArray(ArrayList<Comment> comments){
-        Gson gson = new Gson();
-        Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();
-        
-        String json = gson.toJson(comments, typeOfComments);
-        return json;
+    public String asJson(String targetLanguage) {
+        ArrayList<Comment> translatedComments = new ArrayList<Comment>();
+        final Gson gson = new Gson();
+        final Type typeOfComments = new TypeToken<ArrayList<Comment>>(){}.getType();
+        if(targetLanguage.equals("org")){
+            return gson.toJson(comments, typeOfComments);
+        } else{
+            Translate translate = TranslateOptions.newBuilder().setProjectId("apodob-step-2020").setQuotaProjectId("apodob-step-2020").build().getService();      
+            for(Comment comment : comments){
+                translatedComments.add(new Comment(comment.getAuthor(), 
+                                translate.translate(comment.getComment(),Translate.TranslateOption.targetLanguage(targetLanguage)).getTranslatedText(),
+                                comment.getTimestamp()));
+            }
+            return gson.toJson(translatedComments, typeOfComments);
+        }   
     }
 }
