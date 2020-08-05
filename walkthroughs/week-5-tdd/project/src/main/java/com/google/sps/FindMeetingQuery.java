@@ -21,8 +21,8 @@ import java.util.Stack;
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     /**
-     * importantRanges - store time ranges that are important for at leas on attendee in the request
-     * busyIntervals - eventualy store merged important time ranges
+     * importantRanges - store time ranges that are important for at least one attendee in the request
+     * busyIntervals - eventually store merged important time ranges
      * freeIntervals - used to collect intevals that are between busyIntervals   
      */
     ArrayList<TimeRange> importantRanges = new ArrayList<TimeRange>();
