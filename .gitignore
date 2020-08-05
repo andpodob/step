@@ -6,6 +6,6 @@ target/
 walkthroughs/
 .settings/
 .vscode
-!walkthroughs/week-5-tdd/intro
-!walkthroughs/week-5-tdd/project
+!walkthroughs/week-5-tdd/intro/*
+!walkthroughs/week-5-tdd/project/*
 

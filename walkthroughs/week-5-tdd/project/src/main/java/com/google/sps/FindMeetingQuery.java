@@ -16,12 +16,18 @@ package com.google.sps;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    ArrayList<TimeRange> busyIntervals = new ArrayList<TimeRange>();
-    ArrayList<TimeRange> freeIntervals = new ArrayList<TimeRange>();
+    /**
+     * importantRanges - store time ranges that are important for at leas on attendee in the request
+     * busyIntervals - eventualy store merged important time ranges
+     * freeIntervals - used to collect intevals that are between busyIntervals   
+     */
     ArrayList<TimeRange> importantRanges = new ArrayList<TimeRange>();
+    Stack<TimeRange> busyIntervals = new Stack<TimeRange>();
+    ArrayList<TimeRange> freeIntervals = new ArrayList<TimeRange>();
     
     for(String attendee : request.getAttendees()){
       for (Event event : events){
@@ -35,36 +41,24 @@ public final class FindMeetingQuery {
    
     TimeRange popedRange;
     for(TimeRange timeRange : importantRanges){
-      if(busyIntervals.size() > 0 && timeRange.overlaps(busyIntervals.get(busyIntervals.size()-1))){
-        popedRange = busyIntervals.get(busyIntervals.size()-1);
-        busyIntervals.remove(busyIntervals.size() - 1);
-        busyIntervals.add(mergeTimeRanges(popedRange, timeRange));
+      if(busyIntervals.size() > 0 && timeRange.overlaps(busyIntervals.peek())){
+        popedRange = busyIntervals.pop();
+        busyIntervals.push(mergeTimeRanges(popedRange, timeRange));
       }else{
-        busyIntervals.add(timeRange);
+        busyIntervals.push(timeRange);
       }
     }
 
     int duration;
-    if(busyIntervals.size() > 0 ) {
-      //interval in the beginig
-      duration = busyIntervals.get(0).start();
-      if(duration > 0 && duration >= request.getDuration()) 
-        freeIntervals.add(new TimeRange(TimeRange.START_OF_DAY, busyIntervals.get(0).start()));
-      
-      //intervals in the middle
-      for(int i = 0; i < busyIntervals.size()-1; i++){
-        duration = busyIntervals.get(i+1).start()-busyIntervals.get(i).end();
-        if(duration > 0 && duration >= request.getDuration())
-          freeIntervals.add(new TimeRange(busyIntervals.get(i).end(), busyIntervals.get(i+1).start()-busyIntervals.get(i).end()));
-      }
-      
-      //interval at the end
-      duration = TimeRange.END_OF_DAY - busyIntervals.get(busyIntervals.size()-1).end()+1;
+    //dummy TimeRanges to provide limits to the entire space
+    busyIntervals.add(0, new TimeRange(TimeRange.START_OF_DAY, TimeRange.START_OF_DAY));
+    busyIntervals.add(new TimeRange(TimeRange.END_OF_DAY+1, TimeRange.END_OF_DAY+1));
+    //this loop calculates size of free space between two subsequent intervals, and checks if size meets requirements
+    //if so it adds this space to freeIntervals that stores possible place for requested event
+    for(int i = 0; i < busyIntervals.size()-1; i++){
+      duration = busyIntervals.get(i+1).start()-busyIntervals.get(i).end();
       if(duration > 0 && duration >= request.getDuration())
-        freeIntervals.add(new TimeRange(busyIntervals.get(busyIntervals.size()-1).end(), TimeRange.END_OF_DAY - busyIntervals.get(busyIntervals.size()-1).end()+1));
-    
-    } else if(request.getDuration() <= TimeRange.WHOLE_DAY.duration()){
-      freeIntervals.add(TimeRange.WHOLE_DAY);
+        freeIntervals.add(new TimeRange(busyIntervals.get(i).end(), busyIntervals.get(i+1).start()-busyIntervals.get(i).end()));
     }
 
     return freeIntervals;
