@@ -15,122 +15,97 @@
 package com.google.sps;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Stack;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     /**
-     * importantRanges - store time ranges that are important for at least one mandatory attendee in the request (doesn't apply to opitonal attendees)
-     * optionalImportantRanges - store time ranges that are important for mandatory as well as optional attendees 
-     * busyIntervals - eventualy store merged important time ranges
-     * optionalBusyRanges - same as above but for mandatory and optional attendees
-     * freeIntervals - used to collect intevals that are between busyIntervals
-     * freeRangesWithOptionals - same as above but for mandatory and optional attendees   
+     * requiredBusyRanges - store time ranges that are important for at least one mandatory attendee in the request (doesn't apply to optional attendees)
+     * allBusyRanges - store time ranges that are important for mandatory as well as optional attendees 
+     * requiredBusyRangesMerged - eventually store merged important time ranges
+     * allBusyRangesMerged - same as above but for mandatory and optional attendees 
      */
-    ArrayList<TimeRange> importantRanges = new ArrayList<TimeRange>();
-    ArrayList<TimeRange> optionalImportantRanges = new ArrayList<TimeRange>();
-    Stack<TimeRange> busyRanges = new Stack<TimeRange>();
-    Stack<TimeRange> optionalBusyRanges = new Stack<TimeRange>();
-    ArrayList<TimeRange> freeRanges = new ArrayList<TimeRange>();
-    ArrayList<TimeRange> freeRangesWithOptionals = new ArrayList<TimeRange>();
-    
-    //list that helps in optimizing search for important events
-    LinkedList<Event> eventsList = new LinkedList<Event>(events);
-    LinkedList<Event> eventsLeft = eventsList;
-    //populates importantRanges and optionalImportantRanges with ranges that are important for mandatory attendees
-    for(String attendee : request.getAttendees()){
-      eventsList = eventsLeft;
-      eventsLeft = new LinkedList<Event>();
-      for (Event event : eventsList){
-        if(event.getAttendees().contains(attendee)){
-          importantRanges.add(event.getWhen());
-          optionalImportantRanges.add(event.getWhen());
-        } else{
-          eventsLeft.add(event);
-        }
-      }
-    }
-    //same as above but for optional attendees
-    eventsList = new LinkedList<Event>(events);
-    eventsLeft = eventsList;
-    for(String attendee : request.getOptionalAttendees()){
-      eventsList = eventsLeft;
-      eventsLeft = new LinkedList<Event>();
-      for (Event event : eventsList){
-        if(event.getAttendees().contains(attendee)){
-          optionalImportantRanges.add(event.getWhen());
-        } else{
-          eventsLeft.add(event);
-        }
-      }
-    }
-    // after two above steps in optionalImportantRanges we have important ranges for optional and mandatory attendees and in
-    // importantRanges ranges important for only mandatory attendees
+    ArrayList<TimeRange> requiredBusyRanges = new ArrayList<TimeRange>();
+    ArrayList<TimeRange> allBusyRanges = new ArrayList<TimeRange>();
+    Stack<TimeRange> requiredBusyRangesMerged = new Stack<TimeRange>();
+    Stack<TimeRange> allBusyRangesMerged = new Stack<TimeRange>();
 
-    // if there are no occupied or optionaly occupied intervals to consider we can immediately return list with WHOLE_DAY
-    // or empty list if WHOLE_DAY is not enaugh to meet duration requirement
-    if(optionalImportantRanges.size() == 0){
-      if(request.getDuration() <= TimeRange.WHOLE_DAY.duration()){
-        return Arrays.asList(TimeRange.WHOLE_DAY);
-      } else{ 
-        return Arrays.asList();
+    for (Event event : events){
+      for (String attendee : request.getAttendees()){
+        if(event.getAttendees().contains(attendee)){
+          requiredBusyRanges.add(event.getWhen());
+          allBusyRanges.add(event.getWhen());
+          break;
+        }
       }
     }
 
-    //sorting ranges by start to ease proces of merging intervals
-    optionalImportantRanges.sort(TimeRange.ORDER_BY_START);
-    importantRanges.sort(TimeRange.ORDER_BY_START);
-    
-    //merging intervals in both importantRanges and optionalImportantRanges
-    TimeRange popedRange;
-    if(importantRanges.size() > 0){
-      busyRanges.push(importantRanges.get(0));
-      for(TimeRange timeRange : importantRanges){
-        if(timeRange.overlaps(busyRanges.peek())){
-          popedRange = busyRanges.pop();
-          busyRanges.push(mergeTimeRanges(popedRange, timeRange));
-        }else{
-          busyRanges.push(timeRange);
+    for (Event event : events){
+      for (String attendee : request.getOptionalAttendees()){
+        if(event.getAttendees().contains(attendee)){
+          allBusyRanges.add(event.getWhen());
+          break;
         }
       }
     }
-  
-    optionalBusyRanges.push(optionalImportantRanges.get(0));
-    for(TimeRange timeRange : optionalImportantRanges){
-      if(timeRange.overlaps(optionalBusyRanges.peek())){
-        popedRange = optionalBusyRanges.pop();
-        optionalBusyRanges.push(mergeTimeRanges(popedRange, timeRange));
+
+    // after two above steps in allBusyRanges we have important ranges for optional and mandatory attendees and in
+    // requiredBusyRanges ranges important for only mandatory attendees
+
+    //sorting ranges by start to ease process of merging intervals
+    allBusyRanges.sort(TimeRange.ORDER_BY_START);
+    requiredBusyRanges.sort(TimeRange.ORDER_BY_START);
+    
+    //merging intervals in both requiredBusyRanges and allBusyRanges
+    TimeRange topRange;
+    if(requiredBusyRanges.size() > 0) requiredBusyRangesMerged.push(requiredBusyRanges.get(0));
+    
+    for(TimeRange timeRange : requiredBusyRanges){
+      if(timeRange.overlaps(requiredBusyRangesMerged.peek())){
+        topRange = requiredBusyRangesMerged.pop();
+        requiredBusyRangesMerged.push(mergeTimeRanges(topRange, timeRange));
       }else{
-        optionalBusyRanges.push(timeRange);
+        requiredBusyRangesMerged.push(timeRange);
+      }
+    }
+    
+  
+    if(allBusyRanges.size() > 0) allBusyRangesMerged.push(allBusyRanges.get(0));
+    for(TimeRange timeRange : allBusyRanges){
+      if(timeRange.overlaps(allBusyRangesMerged.peek())){
+        topRange = allBusyRangesMerged.pop();
+        allBusyRangesMerged.push(mergeTimeRanges(topRange, timeRange));
+      }else{
+        allBusyRangesMerged.push(timeRange);
       }
     }
 
-    //looking for free spaces among merged intervals
     int duration;
     //dummy TimeRanges to provide limits to the entire space
-    busyRanges.add(0, new TimeRange(TimeRange.START_OF_DAY, TimeRange.START_OF_DAY));
-    busyRanges.add(new TimeRange(TimeRange.END_OF_DAY+1, TimeRange.END_OF_DAY+1));
-    optionalBusyRanges.add(0, new TimeRange(TimeRange.START_OF_DAY, TimeRange.START_OF_DAY));
-    optionalBusyRanges.add(new TimeRange(TimeRange.END_OF_DAY+1, TimeRange.END_OF_DAY+1));
+    requiredBusyRangesMerged.add(new TimeRange(TimeRange.END_OF_DAY+1, TimeRange.END_OF_DAY+1));
+    requiredBusyRangesMerged.add(0, new TimeRange(TimeRange.START_OF_DAY, TimeRange.START_OF_DAY));
+    allBusyRangesMerged.add(new TimeRange(TimeRange.END_OF_DAY+1, TimeRange.END_OF_DAY+1));
+    allBusyRangesMerged.add(0, new TimeRange(TimeRange.START_OF_DAY, TimeRange.START_OF_DAY));
+
     //this loop calculates size of free space between two subsequent intervals, and checks if size meets requirements
     //if so it adds this space to freeIntervals that stores possible place for requested event
-    for(int i = 0; i < busyRanges.size()-1; i++){
-      duration = busyRanges.get(i+1).start()-busyRanges.get(i).end();
+    ArrayList<TimeRange> freeRanges = new ArrayList<TimeRange>();
+    for(int i = 0; i < allBusyRangesMerged.size()-1; i++){
+      duration = allBusyRangesMerged.get(i+1).start()-allBusyRangesMerged.get(i).end();
       if(duration > 0 && duration >= request.getDuration())
-        freeRanges.add(new TimeRange(busyRanges.get(i).end(), busyRanges.get(i+1).start()-busyRanges.get(i).end()));
-    }
-    for(int i = 0; i < optionalBusyRanges.size()-1; i++){
-      duration = optionalBusyRanges.get(i+1).start()-optionalBusyRanges.get(i).end();
-      if(duration > 0 && duration >= request.getDuration())
-        freeRangesWithOptionals.add(new TimeRange(optionalBusyRanges.get(i).end(), optionalBusyRanges.get(i+1).start()-optionalBusyRanges.get(i).end()));
+        freeRanges.add(new TimeRange(allBusyRangesMerged.get(i).end(), allBusyRangesMerged.get(i+1).start()-allBusyRangesMerged.get(i).end()));
     }
 
-    //if with optional attendees there is no room for the meeting we return freeRangesWithoutOptionals
-    if(freeRangesWithOptionals.size() == 0) return freeRanges;
-    else return freeRangesWithOptionals;
+    //if we haven't found any free space with optional attendees we calculate free space ranges without optional
+    if(freeRanges.size() == 0){
+      for(int i = 0; i < requiredBusyRangesMerged.size()-1; i++){
+        duration = requiredBusyRangesMerged.get(i+1).start()-requiredBusyRangesMerged.get(i).end();
+        if(duration > 0 && duration >= request.getDuration())
+          freeRanges.add(new TimeRange(requiredBusyRangesMerged.get(i).end(), requiredBusyRangesMerged.get(i+1).start()-requiredBusyRangesMerged.get(i).end()));
+      }
+    }
+    return freeRanges;
   }
 
   private TimeRange mergeTimeRanges(TimeRange a, TimeRange b){
