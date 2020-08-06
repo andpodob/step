@@ -420,9 +420,8 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void optionalOnly() {
-    // Have each person have different events. We should see two options because each person has
-    // split the restricted times.
-    //
+    // Hare each person have different events and both attendees are optional to requested event. 
+    // We should see three options because each person has split the restricted times.
     // Events  :       |--A--|     |--B--|
     // Day     : |-----------------------------|
     // Options : |--1--|     |--2--|     |--3--|
@@ -450,8 +449,9 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void optionalOnlyNoGap() {
-    // Have each person have different events. We should see two options because each person has
-    // split the restricted times.
+    // Hare each person have different events and both are optional attendees. There is no gap so there 
+    // is no free space if we consider optional attendees, at the same time there are no restrictions due
+    // to mandatory attendees because their amount is equal to 0, so there is one option -> WHOLE_DAY
     //
     // Optional  : |-----A-----|
     //           :         |----------B----------|
